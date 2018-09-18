@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Threading;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Script
 {
@@ -9,6 +13,7 @@ namespace Script
         [SerializeField] private List<Color> colors;
         [SerializeField] private Player playerPrefab;
         [SerializeField] private string url;
+        [SerializeField] private Camera mainCamera;
 
         private int nbPlayers;
         private int sizeMap;
@@ -16,11 +21,19 @@ namespace Script
         private Player[] players;
         private int index;
 
+
         private void Start()
         {
-            //===== TEMP ======
-            lines = File.ReadAllLines(url);
-            //=================
+
+            using (UnityWebRequest www = UnityWebRequest.Get(url))
+            {
+                var send = www.SendWebRequest();
+                while (!send.isDone)
+                    continue;
+
+                lines = www.downloadHandler.text.Split('\n');
+            }
+
             nbPlayers = int.Parse(lines[0]);
             sizeMap = int.Parse(lines[1]);
             players = new Player[nbPlayers];
@@ -34,9 +47,11 @@ namespace Script
                     Quaternion.identity,
                     null);
             }
-
             index = nbPlayers + 2;
+
+            mainCamera.orthographicSize = sizeMap / 2f;
         }
+
 
         private float cumul;
 
@@ -46,13 +61,39 @@ namespace Script
             if (cumul < 1)
                 return;
             cumul -= 1;
-            
+
+            if (index == lines.Length)
+            {
+                EndOfGame();
+                return;
+            }
+
             var dirs = lines[index].Split(' ');
             index++;
             for (var i = 0; i < nbPlayers; i++)
             {
-                players[i].Turn((Direction) int.Parse(dirs[i]));
+                var dir = int.Parse(dirs[i]);
+                if (dir >= 0)
+                    players[i].Turn((Direction) dir);
+                else
+                    StopPlayer(i);
             }
+        }
+
+
+        private void StopPlayer(int i)
+        {
+            if (players[i] == null)
+                return;
+            players[i].Stop();
+            players[i] = null;
+        }
+
+        private void EndOfGame()
+        {
+            for (var i = 0; i < nbPlayers; i++)
+                StopPlayer(i);
+            enabled = false;
         }
     }
 }

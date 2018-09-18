@@ -88,10 +88,10 @@ namespace Script
         }
 
 
-        private void Stop()
+        public void Stop()
         {
             trail.Stop();
-            enabled = false;
+            gameObject.SetActive(false);
         }
     }
 }
