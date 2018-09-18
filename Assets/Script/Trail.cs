@@ -9,15 +9,12 @@ namespace Script
         public GameObject CornerStart;
 
         private float size;
-        private ParticleSystem particles;
         private Material material;
 
         private void Start()
         {
             material = new Material(Shader.Find("Standard"));
             transform.localScale = new Vector3(0, 1, 1);
-            particles = GetComponentInChildren<ParticleSystem>();
-            GetComponentInChildren<ParticleSystemRenderer>().material = material;
             GetComponentInChildren<MeshRenderer>().material = material;
             CornerStart.GetComponent<MeshRenderer>().material = material;
             material.color = Color;
@@ -34,7 +31,6 @@ namespace Script
 
         public void Stop()
         {
-            particles.Stop();
             enabled = false;
         }
     }

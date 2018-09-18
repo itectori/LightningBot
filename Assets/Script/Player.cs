@@ -26,6 +26,7 @@ namespace Script
 
         private void Start()
         {
+            GetComponentInChildren<ParticleSystemRenderer>().material.color = Color;
             direction = InitialDirection;
             TrailPrefab.Color = Color;
             TrailPrefab.Speed = Speed;
