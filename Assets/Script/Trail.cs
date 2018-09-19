@@ -20,7 +20,7 @@ namespace Script
             GetComponentInChildren<MeshRenderer>().material = material;
             CornerStart.GetComponent<MeshRenderer>().material = material;
             material.color = Color;
-            Instantiate(CornerStart, transform.position, Quaternion.identity, null);
+            Instantiate(CornerStart, transform.position, Quaternion.Euler(-90, 0, 0), null);
         }
 
 
@@ -33,6 +33,7 @@ namespace Script
 
         public void Stop()
         {
+            transform.localScale = new Vector3((int)(transform.localScale.x + 0.5f), 1, 1);
             enabled = false;
         }
     }
