@@ -1,8 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -21,15 +18,15 @@ namespace Script
         private Player[] players;
         private int index;
 
-        
-        //tmp
-        private bool ready = false;
 
-        private IEnumerator get()
+        //tmp
+        private bool ready;
+
+        private IEnumerator Get()
         {
-            using (UnityWebRequest www = UnityWebRequest.Get(url))
+            using (var www = UnityWebRequest.Get(url))
             {
-                yield return www.Send();
+                yield return www.SendWebRequest();
 
                 if (www.isNetworkError || www.isHttpError)
                 {
@@ -37,9 +34,10 @@ namespace Script
                 }
                 else
                 {
-                    Debug.Log("ok : " + www.downloadHandler.text);
                     lines = www.downloadHandler.text.Split('\n');
-                    nbPlayers = int.Parse(lines[0]);
+                    nbPlayers = lines[0].Split(' ').Length;
+                    if (nbPlayers == 1)
+                        nbPlayers = int.Parse(lines[0]);
                     sizeMap = int.Parse(lines[1]);
                     players = new Player[nbPlayers];
                     for (var i = 0; i < nbPlayers; i++)
@@ -64,7 +62,7 @@ namespace Script
 
         private void Start()
         {
-            StartCoroutine(get());
+            StartCoroutine(Get());
         }
 
 
@@ -74,13 +72,13 @@ namespace Script
         {
             if (!ready)
                 return;
-                
+
             cumul += Time.deltaTime;
             if (cumul < 1)
                 return;
             cumul -= 1;
 
-            if (index == lines.Length)
+            if (index == lines.Length || lines[index] == "")
             {
                 EndOfGame();
                 return;
