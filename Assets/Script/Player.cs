@@ -34,7 +34,6 @@ namespace Script
             Color.RGBToHSV(Color, out darkColor.r, out darkColor.g, out darkColor.b);
             darkColor =  Color.HSVToRGB(darkColor.r, darkColor.g, darkColor.b/2);
             darkColor.a = 1;
-            Color.a = 1;
             var main = pc.main;
             main.startColor = new ParticleSystem.MinMaxGradient(Color, darkColor);
             direction = InitialDirection;

@@ -22,7 +22,7 @@ namespace Script
             while(true)
             {
                 light.intensity = Random.Range(0.9f, 1.1f);
-                light.range = Random.Range(5, 7);
+                light.range = Random.Range(8, 12);
                 yield return new WaitForSeconds(Random.Range(0.01f, 0.1f));
             }
         }
