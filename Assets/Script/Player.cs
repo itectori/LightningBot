@@ -16,6 +16,8 @@ namespace Script
         [SerializeField] private bool control;
 
         public Color Color;
+        [HideInInspector]
+        public Color darkColor;
         public float Speed;
         public Trail TrailPrefab;
         public Direction InitialDirection;
@@ -26,7 +28,14 @@ namespace Script
 
         private void Start()
         {
-            GetComponentInChildren<ParticleSystemRenderer>().material.color = Color;
+            var pc = GetComponentInChildren<ParticleSystem>();
+            
+
+            Color.RGBToHSV(Color, out darkColor.r, out darkColor.g, out darkColor.b);
+            darkColor =  Color.HSVToRGB(darkColor.r, darkColor.g, darkColor.b/2);
+            darkColor.a = 1;
+            var main = pc.main;
+            main.startColor = new ParticleSystem.MinMaxGradient(Color, darkColor);
             direction = InitialDirection;
             TrailPrefab.Color = Color;
             TrailPrefab.Speed = Speed;
