@@ -4,6 +4,8 @@ namespace Script
 {
     public class Trail : MonoBehaviour
     {
+        [SerializeField] private Material standardMat;
+        
         public float Speed = 1;
         public Color Color;
         public GameObject CornerStart;
@@ -13,7 +15,7 @@ namespace Script
 
         private void Start()
         {
-            material = new Material(Shader.Find("Standard"));
+            material = new Material(standardMat);
             transform.localScale = new Vector3(0, 1, 1);
             GetComponentInChildren<MeshRenderer>().material = material;
             CornerStart.GetComponent<MeshRenderer>().material = material;
