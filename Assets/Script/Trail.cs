@@ -9,6 +9,7 @@ namespace Script
         public float Speed = 1;
         public Color Color;
         public GameObject CornerStart;
+        public float CornerAngle;
 
         private float size;
         private Material material;
@@ -21,7 +22,7 @@ namespace Script
             transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
             CornerStart.transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
             material.color = Color;
-            Instantiate(CornerStart, transform.position, Quaternion.identity, null)
+            Instantiate(CornerStart, transform.position, Quaternion.Euler(0, CornerAngle, 0), null)
                 .transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
         }
 

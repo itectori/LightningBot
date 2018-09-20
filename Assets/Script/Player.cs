@@ -86,14 +86,15 @@ namespace Script
 
             TrailPrefab.Color = Color;
             TrailPrefab.Speed = Speed;
-            direction = dir;
             if (trail)
                 trail.Stop();
             transform.position += new Vector3(
                 transform.position.x > 0 ? 0.5f : -0.5f, 0,
                 transform.position.z > 0 ? 0.5f : -0.5f);
             transform.position = new Vector3((int) transform.position.x, 0, (int) transform.position.z);
+            TrailPrefab.CornerAngle = (4 * (int) direction + (int) dir) % 3 == 0 ? 90 : 0;
             trail = Instantiate(TrailPrefab, transform.position, Quaternion.Euler(0, 90 * (int) dir, 0));
+            direction = dir;
         }
 
 
