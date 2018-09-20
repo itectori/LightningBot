@@ -17,10 +17,12 @@ namespace Script
         {
             material = new Material(standardMat);
             transform.localScale = new Vector3(0, 1, 1);
-            GetComponentInChildren<MeshRenderer>().material = material;
-            CornerStart.GetComponent<MeshRenderer>().material = material;
+            transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
+            transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
+            CornerStart.transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
             material.color = Color;
-            Instantiate(CornerStart, transform.position, Quaternion.Euler(-90, 0, 0), null);
+            Instantiate(CornerStart, transform.position, Quaternion.identity, null)
+                .transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
         }
 
 

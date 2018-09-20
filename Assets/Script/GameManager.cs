@@ -19,7 +19,6 @@ namespace Script
         private int index;
 
 
-        //tmp
         private bool ready;
 
         private IEnumerator Get()
@@ -95,7 +94,6 @@ namespace Script
                     StopPlayer(i);
             }
         }
-
 
         private void StopPlayer(int i)
         {
