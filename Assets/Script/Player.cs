@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Script
@@ -13,6 +14,7 @@ namespace Script
 
     public class Player : MonoBehaviour
     {
+        
         [SerializeField] private bool control;
 
         public Color Color;
@@ -29,7 +31,6 @@ namespace Script
         private void Start()
         {
             var pc = GetComponentInChildren<ParticleSystem>();
-            
 
             Color.RGBToHSV(Color, out darkColor.r, out darkColor.g, out darkColor.b);
             darkColor =  Color.HSVToRGB(darkColor.r, darkColor.g, darkColor.b/2);
