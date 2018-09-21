@@ -21,8 +21,8 @@ namespace Script
         {
             while(true)
             {
-                light.intensity = Random.Range(0.9f, 1.1f);
-                light.range = Random.Range(5, 8);
+                light.intensity = Random.Range(2f, 3f);
+                light.range = Random.Range(1f, 2f);
                 yield return new WaitForSeconds(Random.Range(0.01f, 0.1f));
             }
         }
