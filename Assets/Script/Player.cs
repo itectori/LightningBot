@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Script
 {
@@ -12,97 +14,85 @@ namespace Script
         Up = 3
     }
 
-    public class Player : MonoBehaviour
-    {
-        
-        [SerializeField] private bool control;
-
+    public class Player : MonoBehaviour, ITimelineDependent
+    {        
         public Color Color;
-        [HideInInspector]
-        public Color darkColor;
-        public float Speed;
+        [HideInInspector] public Color DarkColor;
         public Trail TrailPrefab;
-        public Direction InitialDirection;
 
-        private Trail trail;
+
         private Direction direction;
+        private List<Trail> trails;
+        private float previousTime;
 
-
-        private void Start()
+        private void Awake()
         {
             var pc = GetComponentInChildren<ParticleSystem>();
 
-            Color.RGBToHSV(Color, out darkColor.r, out darkColor.g, out darkColor.b);
-            darkColor =  Color.HSVToRGB(darkColor.r, darkColor.g, darkColor.b/2);
-            darkColor.a = 1;
+            Color.RGBToHSV(Color, out DarkColor.r, out DarkColor.g, out DarkColor.b);
+            DarkColor = Color.HSVToRGB(DarkColor.r, DarkColor.g, DarkColor.b / 2);
+            DarkColor.a = 1;
             var main = pc.main;
-            main.startColor = new ParticleSystem.MinMaxGradient(Color, darkColor);
-            direction = InitialDirection;
-            TrailPrefab.Color = Color;
-            TrailPrefab.Speed = Speed;
-            trail = Instantiate(TrailPrefab, transform.position, Quaternion.Euler(0, 90 * (int) direction, 0));
+            main.startColor = new ParticleSystem.MinMaxGradient(Color, DarkColor);
+            trails = new List<Trail>();
+            instancePos = transform.position;
         }
 
 
-        private void Update()
-        {
-            var delta = Speed * Time.deltaTime;
+        private Vector3 instancePos;
 
-            if (control)
+        public void AddTrail(Direction dir, float start, float end)
+        {
+            if (trails.Count == 0 || dir != direction)
             {
-                if (Input.GetKeyDown(KeyCode.Z))
-                    Turn(Direction.Up);
-                else if (Input.GetKeyDown(KeyCode.D))
-                    Turn(Direction.Right);
-                else if (Input.GetKeyDown(KeyCode.S))
-                    Turn(Direction.Down);
-                else if (Input.GetKeyDown(KeyCode.Q))
-                    Turn(Direction.Left);
+                TrailPrefab.StartF = start;
+                TrailPrefab.EndF = end;
+                TrailPrefab.Size = GameManager.Unit;
+                TrailPrefab.Color = Color;
+                TrailPrefab.CornerAngle = ((int) dir + (int) direction) % 3 == 0 ? 90 : 0; 
+                trails.Add(Instantiate(TrailPrefab, instancePos, Quaternion.Euler(0, 90 * (int) dir, 0)));
+                direction = dir;
+            }
+            else
+            {
+                trails.Add(trails.Last());
+                trails.Last().Size += GameManager.Unit;
+                trails.Last().EndF = end;
             }
 
             switch (direction)
             {
-                case Direction.Up:
-                    transform.position += Vector3.forward * delta;
+                case Direction.Right:
+                    instancePos += Vector3.right * GameManager.Unit;
                     break;
                 case Direction.Down:
-                    transform.position += Vector3.back * delta;
+                    instancePos += Vector3.back * GameManager.Unit;
                     break;
                 case Direction.Left:
-                    transform.position += Vector3.left * delta;
+                    instancePos += Vector3.left * GameManager.Unit;
                     break;
-                case Direction.Right:
-                    transform.position += Vector3.right * delta;
+                case Direction.Up:
+                    instancePos += Vector3.forward * GameManager.Unit;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-
-        public void Turn(Direction dir)
+        public void TimelineUpdate(float f)
         {
-            if (dir == direction)
+            if (Math.Abs(f - previousTime) < 0.01f)
                 return;
-
-            TrailPrefab.Color = Color;
-            TrailPrefab.Speed = Speed;
-            if (trail)
-                trail.Stop();
-            transform.position += new Vector3(
-                transform.position.x > 0 ? 0.5f : -0.5f, 0,
-                transform.position.z > 0 ? 0.5f : -0.5f);
-            transform.position = new Vector3((int) transform.position.x, 0, (int) transform.position.z);
-            TrailPrefab.CornerAngle = (4 * (int) direction + (int) dir) % 3 == 0 ? 90 : 0;
-            trail = Instantiate(TrailPrefab, transform.position, Quaternion.Euler(0, 90 * (int) dir, 0));
-            direction = dir;
-        }
-
-
-        public void Stop()
-        {
-            trail.Stop();
-            gameObject.SetActive(false);
+            if (f >= 1)
+                f = 0.99f;
+            var prevIndex = (int) (previousTime * trails.Count);
+            var index = (int) (f * trails.Count);
+            var start = prevIndex > index ? index : prevIndex;
+            var end = prevIndex > index ? prevIndex : index;
+            for (var i = start; i <= end; i++)
+                trails[i].TimelineUpdate(f);
+            previousTime = f;
+            transform.position = trails[index].GetPos();
         }
     }
 }
