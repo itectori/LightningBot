@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Script
 {
-    public class Trail : MonoBehaviour, ITimelineDependent
+    public class Trail : TimelineDependent
     {
         [SerializeField] private Material standardMat;
 
@@ -32,15 +32,15 @@ namespace Script
             gameObject.SetActive(false);
         }
 
-        public void TimelineUpdate(float f)
+        public override void TimelineUpdate(float t)
         {
             gameObject.SetActive(true);
-            if (f < StartF)
+            if (t < StartF)
             {
                 cornerInstance.SetActive(false);
                 gameObject.SetActive(false);
             }
-            else if (f > EndF)
+            else if (t > EndF)
             {
                 cornerInstance.SetActive(true);
                 gameObject.SetActive(true);
@@ -50,7 +50,7 @@ namespace Script
             {
                 cornerInstance.SetActive(true);
                 gameObject.SetActive(true);
-                transform.localScale = new Vector3(Size * (f - StartF) / (EndF - StartF), 1, 1);
+                transform.localScale = new Vector3(Size * (t - StartF) / (EndF - StartF), 1, 1);
             }
         }
 

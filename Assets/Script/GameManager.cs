@@ -1,22 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using System.IO;
 
 namespace Script
 {
-    public class GameManager : MonoBehaviour, ITimelineDependent
+    public class GameManager : TimelineDependent
     {
         public static float Unit;
+        public static int TotalDuration;
 
         [SerializeField] private List<Color> colors;
         [SerializeField] private Player playerPrefab;
         [SerializeField] private bool local;
         [SerializeField] private string url;
-
-        // Timeline tmp
-        [SerializeField, Range(0, 1)] private float advancement;
 
         private int nbPlayers;
         private int sizeMap;
@@ -38,8 +34,6 @@ namespace Script
         {
             lines = s.Split('\n');
             nbPlayers = lines[0].Split(' ').Length;
-            if (nbPlayers == 1)
-                nbPlayers = int.Parse(lines[0]);
             sizeMap = int.Parse(lines[1]);
             Unit = 20 / (float) sizeMap;
             players = new Player[nbPlayers];
@@ -56,6 +50,7 @@ namespace Script
             nbTours = lines.Length - (nbPlayers + 2);
             if (lines[lines.Length - 1].Split(' ').Length != nbPlayers)
                 nbTours--;
+            TotalDuration = nbTours * 10000;
             for (var i = 0; i < nbTours; i++)
             {
                 var moves = lines[nbPlayers + 2 + i].Split(' ');
@@ -69,19 +64,13 @@ namespace Script
             ready = true;
         }
 
-        //Timeline tmp
-        private void Update()
-        {
-            TimelineUpdate(advancement);
-        }
-
-        public void TimelineUpdate(float f)
+        public override void TimelineUpdate(float t)
         {
             if (!ready)
                 return;
             foreach (var p in players)
             {
-                p.TimelineUpdate(f);
+                p.TimelineUpdate(t);
             }
         }
     }
