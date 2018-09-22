@@ -1,18 +1,22 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Script
 {
-    public class Trail : MonoBehaviour
+    public class Trail : MonoBehaviour, ITimelineDependent
     {
         [SerializeField] private Material standardMat;
-        
-        public float Speed = 1;
+
         public Color Color;
         public GameObject CornerStart;
         public float CornerAngle;
 
-        private float size;
+        public float StartF;
+        public float EndF;
+        public float Size;
+
         private Material material;
+        private GameObject cornerInstance;
 
         private void Start()
         {
@@ -22,22 +26,50 @@ namespace Script
             transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
             CornerStart.transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
             material.color = Color;
-            Instantiate(CornerStart, transform.position, Quaternion.Euler(0, CornerAngle, 0), null)
-                .transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
+            cornerInstance = Instantiate(CornerStart, transform.position, Quaternion.Euler(0, CornerAngle, 0), null);
+            cornerInstance.transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
+            cornerInstance.SetActive(false);
+            gameObject.SetActive(false);
         }
 
-
-        private void Update()
+        public void TimelineUpdate(float f)
         {
-            size += Time.deltaTime * Speed;
-            transform.localScale = new Vector3(size, 1, 1);
+            gameObject.SetActive(true);
+            if (f < StartF)
+            {
+                cornerInstance.SetActive(false);
+                gameObject.SetActive(false);
+            }
+            else if (f > EndF)
+            {
+                cornerInstance.SetActive(true);
+                gameObject.SetActive(true);
+                transform.localScale = new Vector3(Size, 1, 1);
+            }
+            else
+            {
+                cornerInstance.SetActive(true);
+                gameObject.SetActive(true);
+                transform.localScale = new Vector3(Size * (f - StartF) / (EndF - StartF), 1, 1);
+            }
         }
 
-
-        public void Stop()
+        public Vector3 GetPos()
         {
-            transform.localScale = new Vector3((int)(transform.localScale.x + 0.5f), 1, 1);
-            enabled = false;
+            var dir = (Direction) (transform.localEulerAngles.y / 90);
+            switch (dir)
+            {
+                case Direction.Right:
+                    return transform.position + Vector3.right * transform.localScale.x;
+                case Direction.Down:
+                    return transform.position + Vector3.back * transform.localScale.x;
+                case Direction.Left:
+                    return transform.position + Vector3.left * transform.localScale.x;
+                case Direction.Up:
+                    return transform.position + Vector3.forward * transform.localScale.x;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

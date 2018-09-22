@@ -5,26 +5,29 @@ using UnityEngine.Networking;
 
 namespace Script
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : MonoBehaviour, ITimelineDependent
     {
         [SerializeField] private List<Color> colors;
         [SerializeField] private Player playerPrefab;
         [SerializeField] private string url;
 
+        // Timeline tmp
+        [SerializeField, Range(0, 1)] private float advancement;
+
         private int nbPlayers;
         private int sizeMap;
         private string[] lines;
         private Player[] players;
-        private int index;
+        private int nbTours;
         private bool ready;
 
 
         private void Start()
         {
-            StartCoroutine(Tools.WebRequest(url, GetGameInfos));
+            StartCoroutine(Tools.WebRequest(url, ParseGameInfo));
         }
 
-        private void GetGameInfos(string s)
+        private void ParseGameInfo(string s)
         {
             lines = s.Split('\n');
             nbPlayers = lines[0].Split(' ').Length;
@@ -36,60 +39,43 @@ namespace Script
             {
                 var pos = lines[i + 2].Split(' ');
                 playerPrefab.Color = colors[i % colors.Count];
-                playerPrefab.InitialDirection = (Direction) int.Parse(pos[2]);
                 players[i] = Instantiate(playerPrefab,
                     new Vector3(int.Parse(pos[0]) - 5, 0, int.Parse(pos[1]) - 5),
                     Quaternion.identity,
                     null);
             }
-            index = nbPlayers + 2;
+            nbTours = lines.Length - (nbPlayers + 2);
+            if (lines[lines.Length - 1].Split(' ').Length != nbPlayers)
+                nbTours--;
+            for (var i = 0; i < nbTours; i++)
+            {
+                var moves = lines[nbPlayers + 2 + i].Split(' ');
+                for (var p = 0; p < nbPlayers; p++)
+                {
+                    players[p].AddTrail((Direction) int.Parse(moves[p]), (float) i / nbTours, (float)(i + 1) / nbTours);
+                }
+            }
             ready = true;
         }
 
 
         private float cumul;
 
+
+        //Timeline tmp
         private void Update()
         {
             if (!ready)
                 return;
-
-            cumul += Time.deltaTime;
-            if (cumul < 1)
-                return;
-            cumul -= 1;
-
-            if (index == lines.Length || lines[index] == "")
-            {
-                EndOfGame();
-                return;
-            }
-
-            var dirs = lines[index].Split(' ');
-            index++;
-            for (var i = 0; i < nbPlayers; i++)
-            {
-                var dir = int.Parse(dirs[i]);
-                if (dir >= 0)
-                    players[i].Turn((Direction) dir);
-                else
-                    StopPlayer(i);
-            }
+            TimelineUpdate(advancement);
         }
 
-        private void StopPlayer(int i)
+        public void TimelineUpdate(float f)
         {
-            if (players[i] == null)
-                return;
-            players[i].Stop();
-            players[i] = null;
-        }
-
-        private void EndOfGame()
-        {
-            for (var i = 0; i < nbPlayers; i++)
-                StopPlayer(i);
-            enabled = false;
+            foreach (var p in players)
+            {
+                p.TimelineUpdate(f);
+            }
         }
     }
 }
