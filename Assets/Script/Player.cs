@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Script
 {
@@ -14,7 +15,7 @@ namespace Script
     }
 
     public class Player : MonoBehaviour, ITimelineDependent
-    {
+    {        
         public Color Color;
         [HideInInspector] public Color DarkColor;
         public Trail TrailPrefab;
@@ -46,7 +47,7 @@ namespace Script
             {
                 TrailPrefab.StartF = start;
                 TrailPrefab.EndF = end;
-                TrailPrefab.Size = 1;
+                TrailPrefab.Size = GameManager.Unit;
                 TrailPrefab.Color = Color;
                 TrailPrefab.CornerAngle = ((int) dir + (int) direction) % 3 == 0 ? 90 : 0; 
                 trails.Add(Instantiate(TrailPrefab, instancePos, Quaternion.Euler(0, 90 * (int) dir, 0)));
@@ -55,23 +56,23 @@ namespace Script
             else
             {
                 trails.Add(trails.Last());
-                trails.Last().Size++;
+                trails.Last().Size += GameManager.Unit;
                 trails.Last().EndF = end;
             }
 
             switch (direction)
             {
                 case Direction.Right:
-                    instancePos += Vector3.right;
+                    instancePos += Vector3.right * GameManager.Unit;
                     break;
                 case Direction.Down:
-                    instancePos += Vector3.back;
+                    instancePos += Vector3.back * GameManager.Unit;
                     break;
                 case Direction.Left:
-                    instancePos += Vector3.left;
+                    instancePos += Vector3.left * GameManager.Unit;
                     break;
                 case Direction.Up:
-                    instancePos += Vector3.forward;
+                    instancePos += Vector3.forward * GameManager.Unit;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -88,7 +89,6 @@ namespace Script
             var index = (int) (f * trails.Count);
             var start = prevIndex > index ? index : prevIndex;
             var end = prevIndex > index ? prevIndex : index;
-            print(start + " - " + end);
             for (var i = start; i <= end; i++)
                 trails[i].TimelineUpdate(f);
             previousTime = f;
