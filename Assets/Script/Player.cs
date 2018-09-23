@@ -50,7 +50,7 @@ namespace Script
                 TrailPrefab.EndF = end;
                 TrailPrefab.Size = GameManager.Unit;
                 TrailPrefab.Color = Color;
-                TrailPrefab.CornerAngle = ((int) dir + (int) direction) % 3 == 0 ? 90 : 0;
+                //TrailPrefab.CornerAngle = ((int) dir + (int) direction) % 3 == 0 ? 90 : 0;
                 trails.Add(Instantiate(TrailPrefab, instancePos, Quaternion.Euler(0, 90 * (int) dir, 0), transform));
                 direction = dir;
             }

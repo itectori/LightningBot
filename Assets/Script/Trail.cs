@@ -8,27 +8,27 @@ namespace Script
         [SerializeField] private Material standardMat;
 
         public Color Color;
-        public GameObject CornerStart;
-        public float CornerAngle;
+        //public GameObject CornerStart;
+        //public float CornerAngle;
 
         public float StartF;
         public float EndF;
         public float Size;
 
         private Material material;
-        private GameObject cornerInstance;
+        //private GameObject cornerInstance;
 
         private void Start()
         {
             material = new Material(standardMat);
             transform.localScale = new Vector3(0, 1, 1);
             transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
-            transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
-            CornerStart.transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
+            //transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
+            //CornerStart.transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
             material.color = Color;
-            cornerInstance = Instantiate(CornerStart, transform.position, Quaternion.Euler(0, CornerAngle, 0), transform.parent);
-            cornerInstance.transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
-            cornerInstance.SetActive(false);
+            //cornerInstance = Instantiate(CornerStart, transform.position, Quaternion.Euler(0, CornerAngle, 0), transform.parent);
+            //cornerInstance.transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
+            //cornerInstance.SetActive(false);
             gameObject.SetActive(false);
         }
 
@@ -37,18 +37,18 @@ namespace Script
             gameObject.SetActive(true);
             if (t < StartF)
             {
-                cornerInstance.SetActive(false);
+                //cornerInstance.SetActive(false);
                 gameObject.SetActive(false);
             }
             else if (t > EndF)
             {
-                cornerInstance.SetActive(true);
+                //cornerInstance.SetActive(true);
                 gameObject.SetActive(true);
                 transform.localScale = new Vector3(Size, 1, 1);
             }
             else
             {
-                cornerInstance.SetActive(true);
+               //cornerInstance.SetActive(true);
                 gameObject.SetActive(true);
                 transform.localScale = new Vector3(Size * (t - StartF) / (EndF - StartF), 1, 1);
             }
