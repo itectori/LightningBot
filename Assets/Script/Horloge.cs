@@ -5,14 +5,13 @@ namespace Script
 {
     public class Horloge : ATimelineDependent
     {
-        [SerializeField]
-        private TMPro.TextMeshProUGUI minutes;
-        [SerializeField]
-        private TMPro.TextMeshProUGUI seconds;
+        [SerializeField] private TMPro.TextMeshProUGUI minutes;
+        [SerializeField] private TMPro.TextMeshProUGUI seconds;
 
         public override void TimelineUpdate(float t)
         {
-            UpdateTime(t * GameManager.TotalDuration);
+            if (GameManager.Ready)
+                UpdateTime(t * GameManager.TotalDuration);
         }
 
         private void UpdateTime(float t)

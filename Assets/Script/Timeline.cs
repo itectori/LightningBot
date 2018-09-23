@@ -12,12 +12,12 @@ namespace Script
         [SerializeField] private List<ATimelineDependent> dependences;
 
         private Slider slider;
-        
+
         private Animation anim;
         private const float TIME_TO_WAIT = 1.5f;
         private float lastTime;
         private bool active = true;
-        
+
         private void Start()
         {
             slider = GetComponent<Slider>();
@@ -26,7 +26,7 @@ namespace Script
 
 
         private Vector3 mousePos;
-        
+
         private void Update()
         {
             var pos = Input.mousePosition;
@@ -43,11 +43,13 @@ namespace Script
                     Hide();
                 }
             }
-            
-            slider.value += Time.deltaTime / GameManager.TotalDuration * 2 * GameManager.TimeTurn;
 
-            foreach (var d in dependences)
-                d.TimelineUpdate(slider.value);
+            if (GameManager.Ready)
+            {
+                slider.value += Time.deltaTime / GameManager.TotalDuration * 2 * GameManager.TimeTurn;
+                foreach (var d in dependences)
+                    d.TimelineUpdate(slider.value);
+            }
         }
 
         private void Activate()

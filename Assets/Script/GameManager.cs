@@ -9,6 +9,7 @@ namespace Script
         public static float Unit;
         public static int TotalDuration;
         public static int TimeTurn;
+        public static bool Ready;
 
         [SerializeField] private List<Color> colors;
         [SerializeField] private Player playerPrefab;
@@ -20,7 +21,6 @@ namespace Script
         private string[] lines;
         private Player[] players;
         private int nbTours;
-        private bool ready;
 
 
         private void Start()
@@ -63,12 +63,12 @@ namespace Script
                 }
             }
 
-            ready = true;
+            Ready = true;
         }
 
         public override void TimelineUpdate(float t)
         {
-            if (!ready)
+            if (!Ready)
                 return;
             foreach (var p in players)
             {
