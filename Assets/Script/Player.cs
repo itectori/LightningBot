@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Script
 {
@@ -14,7 +13,7 @@ namespace Script
         Up = 3
     }
 
-    public class Player : MonoBehaviour, ITimelineDependent
+    public class Player : TimelineDependent
     {        
         public Color Color;
         [HideInInspector] public Color DarkColor;
@@ -79,19 +78,17 @@ namespace Script
             }
         }
 
-        public void TimelineUpdate(float f)
+        public override void TimelineUpdate(float t)
         {
-            if (Math.Abs(f - previousTime) < 0.01f)
-                return;
-            if (f >= 1)
-                f = 0.99f;
             var prevIndex = (int) (previousTime * trails.Count);
-            var index = (int) (f * trails.Count);
+            var index = (int) (t * trails.Count);
+            prevIndex = prevIndex == trails.Count ? prevIndex - 1 : prevIndex;
+            index = index == trails.Count ? index - 1 : index;
             var start = prevIndex > index ? index : prevIndex;
             var end = prevIndex > index ? prevIndex : index;
             for (var i = start; i <= end; i++)
-                trails[i].TimelineUpdate(f);
-            previousTime = f;
+                trails[i].TimelineUpdate(t);
+            previousTime = t;
             transform.position = trails[index].GetPos();
         }
     }

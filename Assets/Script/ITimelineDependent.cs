@@ -1,7 +1,9 @@
-﻿namespace Script
+﻿using UnityEngine;
+
+namespace Script
 {
-	public interface ITimelineDependent
+	public abstract class TimelineDependent : MonoBehaviour
 	{
-		void TimelineUpdate(float f);
+		public abstract void TimelineUpdate(float t);
 	}
 }

@@ -1,25 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
-using System;
 
-public class Horloge : MonoBehaviour {
-    [SerializeField]
-    private TMPro.TextMeshProUGUI minutes;
-    [SerializeField]
-    private TMPro.TextMeshProUGUI seconds;
-
-    private void Update()
+namespace Script
+{
+    public class Horloge : TimelineDependent
     {
-        UpdateTime(Time.time * 1000);
-    }
+        [SerializeField]
+        private TMPro.TextMeshProUGUI minutes;
+        [SerializeField]
+        private TMPro.TextMeshProUGUI seconds;
 
-    void UpdateTime(float t)
-    {
-        TimeSpan ts = TimeSpan.FromMilliseconds(t);
-        var m = string.Format("{0:00}", ts.Minutes);
-        var s = string.Format("{0:00}:{1:00}", ts.Seconds, ts.Milliseconds / 10);
-        minutes.text = m;
-        seconds.text = s;
+        public override void TimelineUpdate(float t)
+        {
+            UpdateTime(t * GameManager.TotalDuration);
+        }
+
+        private void UpdateTime(float t)
+        {
+            var ts = TimeSpan.FromMilliseconds(t);
+            var m = $"{ts.Minutes:00}";
+            var s = $"{ts.Seconds:00}:{ts.Milliseconds / 10:00}";
+            minutes.text = m;
+            seconds.text = s;
+        }
     }
 }
