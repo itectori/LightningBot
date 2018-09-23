@@ -44,7 +44,7 @@ namespace Script
                 }
             }
             
-            slider.value += Time.deltaTime / GameManager.TotalDuration * 20000;
+            slider.value += Time.deltaTime / GameManager.TotalDuration * 2 * GameManager.TimeTurn;
 
             foreach (var d in dependences)
                 d.TimelineUpdate(slider.value);
