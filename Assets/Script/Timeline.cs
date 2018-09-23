@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Remoting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,30 +12,58 @@ namespace Script
         [SerializeField] private List<ATimelineDependent> dependences;
 
         private Slider slider;
-        private float lastValue;
-        private bool automatic;
-
+        
+        private Animation anim;
+        private const float TIME_TO_WAIT = 1.5f;
+        private float lastTime;
+        private bool active = true;
+        
         private void Start()
         {
-            lastValue = 0;
-            automatic = true;
             slider = GetComponent<Slider>();
+            anim = GetComponent<Animation>();
         }
 
+
+        private Vector3 mousePos;
+        
         private void Update()
         {
-            foreach (var d in dependences)
+            var pos = Input.mousePosition;
+            if (pos != mousePos)
             {
-                d.TimelineUpdate(slider.value);
+                mousePos = pos;
+                lastTime = Time.time;
+                Activate();
             }
+            else
+            {
+                if (Time.time - lastTime > TIME_TO_WAIT)
+                {
+                    Hide();
+                }
+            }
+            
+            slider.value += Time.deltaTime / GameManager.TotalDuration * 20000;
 
+            foreach (var d in dependences)
+                d.TimelineUpdate(slider.value);
+        }
 
-            automatic = automatic && Math.Abs(lastValue - slider.value) < 0.01f;
-            if (!automatic)
+        private void Activate()
+        {
+            if (active)
                 return;
-            slider.value = Time.time / GameManager.TotalDuration * 20000;
+            active = true;
+            anim.Play("Appear");
+        }
 
-            lastValue = slider.value;
+        private void Hide()
+        {
+            if (!active)
+                return;
+            active = false;
+            anim.Play("Hide");
         }
     }
 }
