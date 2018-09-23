@@ -2,7 +2,7 @@
 
 namespace Script
 {
-	public abstract class TimelineDependent : MonoBehaviour
+	public abstract class ATimelineDependent : MonoBehaviour
 	{
 		public abstract void TimelineUpdate(float t);
 	}

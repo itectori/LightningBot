@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Script
 {
-    public class GameManager : TimelineDependent
+    public class GameManager : ATimelineDependent
     {
         public static float Unit;
         public static int TotalDuration;

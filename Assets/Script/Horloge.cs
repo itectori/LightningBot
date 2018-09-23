@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Script
 {
-    public class Horloge : TimelineDependent
+    public class Horloge : ATimelineDependent
     {
         [SerializeField]
         private TMPro.TextMeshProUGUI minutes;

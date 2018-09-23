@@ -8,7 +8,7 @@ namespace Script
 {
     public class Timeline : MonoBehaviour
     {
-        [SerializeField] private List<TimelineDependent> dependences;
+        [SerializeField] private List<ATimelineDependent> dependences;
 
         private Slider slider;
         private float lastValue;

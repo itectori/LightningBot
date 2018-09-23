@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Script
 {
-    public class Trail : TimelineDependent
+    public class Trail : ATimelineDependent
     {
         [SerializeField] private Material standardMat;
 
@@ -26,7 +26,7 @@ namespace Script
             transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
             CornerStart.transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
             material.color = Color;
-            cornerInstance = Instantiate(CornerStart, transform.position, Quaternion.Euler(0, CornerAngle, 0), null);
+            cornerInstance = Instantiate(CornerStart, transform.position, Quaternion.Euler(0, CornerAngle, 0), transform.parent);
             cornerInstance.transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
             cornerInstance.SetActive(false);
             gameObject.SetActive(false);

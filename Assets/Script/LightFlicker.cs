@@ -9,7 +9,7 @@ namespace Script
         // Use this for initialization
         void Start() {
             light = GetComponentInChildren<Light>();
-            light.color = GetComponent<Player>().Color;
+            light.color = GetComponentInParent<Player>().Color;
             StartCoroutine(Flicker());
     }
 

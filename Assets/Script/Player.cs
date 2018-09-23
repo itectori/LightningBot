@@ -13,8 +13,8 @@ namespace Script
         Up = 3
     }
 
-    public class Player : TimelineDependent
-    {        
+    public class Player : ATimelineDependent
+    {
         public Color Color;
         [HideInInspector] public Color DarkColor;
         public Trail TrailPrefab;
@@ -23,6 +23,7 @@ namespace Script
         private Direction direction;
         private List<Trail> trails;
         private float previousTime;
+        private Transform head;
 
         private void Awake()
         {
@@ -34,6 +35,7 @@ namespace Script
             var main = pc.main;
             main.startColor = new ParticleSystem.MinMaxGradient(Color, DarkColor);
             trails = new List<Trail>();
+            head = transform.GetChild(0);
             instancePos = transform.position;
         }
 
@@ -48,8 +50,8 @@ namespace Script
                 TrailPrefab.EndF = end;
                 TrailPrefab.Size = GameManager.Unit;
                 TrailPrefab.Color = Color;
-                TrailPrefab.CornerAngle = ((int) dir + (int) direction) % 3 == 0 ? 90 : 0; 
-                trails.Add(Instantiate(TrailPrefab, instancePos, Quaternion.Euler(0, 90 * (int) dir, 0)));
+                TrailPrefab.CornerAngle = ((int) dir + (int) direction) % 3 == 0 ? 90 : 0;
+                trails.Add(Instantiate(TrailPrefab, instancePos, Quaternion.Euler(0, 90 * (int) dir, 0), transform));
                 direction = dir;
             }
             else
@@ -89,7 +91,7 @@ namespace Script
             for (var i = start; i <= end; i++)
                 trails[i].TimelineUpdate(t);
             previousTime = t;
-            transform.position = trails[index].GetPos();
+            head.position = trails[index].GetPos();
         }
     }
 }
