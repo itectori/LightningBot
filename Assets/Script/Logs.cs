@@ -29,7 +29,7 @@ public class Logs : MonoBehaviour {
         queue.Enqueue("<#ffff80>PlayerX</color> go up");
         queue.Enqueue("<#ffff80>PlayerX</color> go up");
         queue.Enqueue("<#ffff80>PlayerX</color> go Left");
-        queue.Enqueue(GetColoredText("PlayerX", Color.cyan)+" go up");
+        queue.Enqueue(ColorMaker.GetColoredText("PlayerX", Color.cyan)+" go up");
 
     }
 	
@@ -37,11 +37,7 @@ public class Logs : MonoBehaviour {
     {
         queue.Enqueue(log);
     }
-    public static string GetColoredText(string text, Color color)
-    {
-        string colString = ColorUtility.ToHtmlStringRGB(color);
-        return "<#" + colString + ">" + text + "</color>";
-    }
+
 
     private TMPro.TextMeshProUGUI getAText()
     {
