@@ -13,85 +13,92 @@ namespace Script
         Up = 3
     }
 
-    public class Player : ATimelineDependent
+    public class Player : ITimelineDepend
     {
-        public Color Color;
-        [HideInInspector] public Color DarkColor;
-        public Trail TrailPrefab;
+        private readonly Color color;
+        private readonly int startX;
+        private readonly int startY;
+        private readonly Transform head;
+        private readonly List<Trail> trail = new List<Trail>();
 
-
-        private Direction direction;
-        private List<Trail> trails;
-        private float previousTime;
-        private Transform head;
-
-        private void Awake()
+        public Player(Color color, int startX, int startY, LightFlicker head)
         {
-            var pc = GetComponentInChildren<ParticleSystem>();
-
-            Color.RGBToHSV(Color, out DarkColor.r, out DarkColor.g, out DarkColor.b);
-            DarkColor = Color.HSVToRGB(DarkColor.r, DarkColor.g, DarkColor.b / 2);
-            DarkColor.a = 1;
-            var main = pc.main;
-            main.startColor = new ParticleSystem.MinMaxGradient(Color, DarkColor);
-            trails = new List<Trail>();
-            head = transform.GetChild(0);
-            instancePos = transform.position;
+            this.color = color;
+            this.startX = startX;
+            this.startY = startY;
+            this.head = head.transform;
+            xInstantiate = startX;
+            yInstantiate = startY;
+            GameManager.DrawRec(
+                GameManager.GridToImage(startX),
+                GameManager.GridToImage(startY),
+                Trail.WIDTH, Trail.WIDTH, color);
+            head.transform.position = new Vector3(
+                GameManager.GridToWorld(xInstantiate),
+                1,
+                GameManager.GridToWorld(yInstantiate));
+            head.SetColor(color);
         }
 
 
-        private Vector3 instancePos;
+        private Direction direction;
+        private float previousTime;
+        private int xInstantiate;
+        private int yInstantiate;
 
-        public void AddTrail(Direction dir, float start, float end)
+        public void AddTrail(int dir, float start, float end)
         {
-            if (trails.Count == 0 || dir != direction)
+            if (dir < 0)
             {
-                TrailPrefab.StartF = start;
-                TrailPrefab.EndF = end;
-                TrailPrefab.Size = GameManager.Unit;
-                TrailPrefab.Color = Color;
-                //TrailPrefab.CornerAngle = ((int) dir + (int) direction) % 3 == 0 ? 90 : 0;
-                trails.Add(Instantiate(TrailPrefab, instancePos, Quaternion.Euler(0, 90 * (int) dir, 0), transform));
-                direction = dir;
+                trail.Add(null);
+                return;
+            }
+
+            var dir_ = (Direction) dir;
+            if (trail.Count == 0 || dir_ != direction)
+            {
+                trail.Add(new Trail(xInstantiate, yInstantiate, start, end, dir_, color));
+                direction = dir_;
             }
             else
             {
-                trails.Add(trails.Last());
-                trails.Last().Size += GameManager.Unit;
-                trails.Last().EndF = end;
+                trail.Add(trail.Last());
+                trail.Last().IncrSize();
+                trail.Last().SetEndF(end);
             }
 
             switch (direction)
             {
                 case Direction.Right:
-                    instancePos += Vector3.right * GameManager.Unit;
+                    xInstantiate++;
                     break;
                 case Direction.Down:
-                    instancePos += Vector3.back * GameManager.Unit;
+                    yInstantiate--;
                     break;
                 case Direction.Left:
-                    instancePos += Vector3.left * GameManager.Unit;
+                    xInstantiate--;
                     break;
                 case Direction.Up:
-                    instancePos += Vector3.forward * GameManager.Unit;
+                    yInstantiate++;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        public override void TimelineUpdate(float t)
+        public void TimelineUpdate(float t)
         {
-            var prevIndex = (int) (previousTime * trails.Count);
-            var index = (int) (t * trails.Count);
-            prevIndex = prevIndex == trails.Count ? prevIndex - 1 : prevIndex;
-            index = index == trails.Count ? index - 1 : index;
+            var prevIndex = (int) (previousTime * trail.Count);
+            var index = (int) (t * trail.Count);
+            prevIndex = prevIndex == trail.Count ? prevIndex - 1 : prevIndex;
+            index = index == trail.Count ? index - 1 : index;
             var start = prevIndex > index ? index : prevIndex;
             var end = prevIndex > index ? prevIndex : index;
             for (var i = start; i <= end; i++)
-                trails[i].TimelineUpdate(t);
+                trail[i]?.TimelineUpdate(t);
             previousTime = t;
-            head.position = trails[index].GetPos();
+            if (trail[index] != null)
+                head.position = trail[index].GetPos();
         }
     }
 }

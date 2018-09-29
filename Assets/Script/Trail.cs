@@ -3,70 +3,102 @@ using UnityEngine;
 
 namespace Script
 {
-    public class Trail : ATimelineDependent
+    public class Trail : ITimelineDepend
     {
-        [SerializeField] private Material standardMat;
-        [SerializeField] private GameObject cornerStart;
+        private readonly int x;
+        private readonly int y;
+        private readonly float startF;
+        private float endF;
+        private readonly Direction dir;
+        private readonly Color color;
+        private int size;
 
-        public Color Color;
-        //public float CornerAngle;
+        public const int WIDTH = 6;
 
-        public float StartF;
-        public float EndF;
-        public float Size;
-
-        private Material material;
-        private GameObject cornerInstance;
-
-        private void Start()
+        public Trail(int x, int y, float startF, float endF, Direction dir, Color color)
         {
-            material = new Material(standardMat);
-            transform.localScale = new Vector3(0, 1, 1);
-            transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
-            //transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
-            cornerStart.transform.GetChild(0).GetComponent<MeshRenderer>().material = material;
-            material.color = Color;
-            cornerInstance = Instantiate(cornerStart, transform.position, Quaternion.identity, transform.parent);
-            //cornerInstance.transform.GetChild(1).GetComponent<MeshRenderer>().material.color = Color;
-            cornerInstance.SetActive(false);
-            gameObject.SetActive(false);
+            this.x = x;
+            this.y = y;
+            this.startF = startF;
+            this.endF = endF;
+            this.dir = dir;
+            this.color = color;
+            size = 1;
         }
 
-        public override void TimelineUpdate(float t)
+        public void SetEndF(float val)
         {
-            gameObject.SetActive(true);
-            if (t < StartF)
-            {
-                cornerInstance.SetActive(false);
-                gameObject.SetActive(false);
-            }
-            else if (t > EndF)
-            {
-                cornerInstance.SetActive(true);
-                gameObject.SetActive(true);
-                transform.localScale = new Vector3(Size, 1, 1);
-            }
-            else
-            {
-                cornerInstance.SetActive(true);
-                gameObject.SetActive(true);
-                transform.localScale = new Vector3(Size * (t - StartF) / (EndF - StartF), 1, 1);
-            }
+            endF = val;
+        }
+
+        public void IncrSize()
+        {
+            size++;
         }
 
         public Vector3 GetPos()
         {
-            var dir = (Direction) (transform.localEulerAngles.y / 90);
+            return new Vector3(GameManager.GridToWorld(x), 1 , GameManager.GridToWorld(y));
+        }
+
+        private float lastLenght;
+        public void TimelineUpdate(float t)
+        {
+            if (t >= endF)
+            {
+                DrawTrail(1, color);
+                lastLenght = 1;
+            }
+            else if (t < startF)
+            {
+                DrawTrail(1, GameManager.Clear);
+                lastLenght = 0;
+            }
+            else
+            {
+                DrawTrail(lastLenght, GameManager.Clear);
+                lastLenght = (t - startF) / (endF - startF);
+                DrawTrail(lastLenght, color);
+            }
+        }
+
+        private void DrawTrail(float length, Color color)
+        {
+            var sizePx = (int) (length * size * GameManager.Unit);
             switch (dir)
             {
                 case Direction.Right:
-                    return transform.position + Vector3.right * transform.localScale.x;
+                    GameManager.DrawRec(
+                        GameManager.GridToImage(x) + WIDTH,
+                        GameManager.GridToImage(y),
+                        sizePx,
+                        WIDTH,
+                        color);
+                    break;
                 case Direction.Down:
-                    return transform.position + Vector3.back * transform.localScale.x;
+                    GameManager.DrawRec(
+                        GameManager.GridToImage(x),
+                        GameManager.GridToImage(y) - sizePx,
+                        WIDTH,
+                        sizePx,
+                        color);
+                    break;
                 case Direction.Left:
-                    return transform.position + Vector3.left * transform.localScale.x;
+                    GameManager.DrawRec(
+                        GameManager.GridToImage(x) - sizePx,
+                        GameManager.GridToImage(y),
+                        sizePx,
+                        WIDTH,
+                        color);
+                    break;
                 case Direction.Up:
-                    return transform.position + Vector3.forward * transform.localScale.x;
+                    GameManager.DrawRec(
+                        GameManager.GridToImage(x),
+                        GameManager.GridToImage(y) + WIDTH,
+                        WIDTH,
+                        sizePx,
+                        color);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

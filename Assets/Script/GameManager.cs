@@ -1,30 +1,46 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Xml;
+using UnityEditor;
+using Color = UnityEngine.Color;
 
 namespace Script
 {
     public class GameManager : ATimelineDependent
     {
-        public static float Unit;
+        public static readonly Color32 Clear = Color.black;
+
+        private const int WIDTH = 1024;
+
+        [SerializeField] private Texture2D texture;
+        [SerializeField] private List<Color32> colors;
+        [SerializeField] private bool local;
+        [SerializeField] private string url;
+        [SerializeField] private LightFlicker head;
+
         public static int TotalDuration;
         public static int TimeTurn;
         public static bool Ready;
 
-        [SerializeField] private List<Color> colors;
-        [SerializeField] private Player playerPrefab;
-        [SerializeField] private bool local;
-        [SerializeField] private string url;
-
-        private int nbPlayers;
-        private int sizeMap;
-        private string[] lines;
-        private Player[] players;
-        private int nbTours;
-
+        private static int nbPlayers;
+        private static int sizeMap;
+        public static float Unit;
+        private static string[] lines;
+        private static Player[] players;
+        private static int nbTours;
+        private static GameManager instance;
 
         private void Start()
         {
+            instance = this;
+            var fillColorArray = texture.GetPixels();
+            for (var i = 0; i < fillColorArray.Length; ++i)
+                fillColorArray[i] = Clear;
+            texture.SetPixels(fillColorArray);
+            texture.Apply();
+            GetComponent<Renderer>().material.mainTexture = texture;
+
             if (local)
                 ParseGameInfo(File.ReadAllText(url));
             else
@@ -37,16 +53,15 @@ namespace Script
             nbPlayers = lines[0].Split(' ').Length;
             sizeMap = int.Parse(lines[1]);
             TimeTurn = int.Parse(lines[2]);
-            Unit = 20 / (float) sizeMap;
+            Unit = WIDTH / (float) (sizeMap + 1);
             players = new Player[nbPlayers];
             for (var i = 0; i < nbPlayers; i++)
             {
                 var pos = lines[i + 3].Split(' ');
-                playerPrefab.Color = colors[i % colors.Count];
-                players[i] = Instantiate(playerPrefab,
-                    new Vector3(int.Parse(pos[0]) * Unit, 0, int.Parse(pos[1]) * Unit),
-                    Quaternion.identity,
-                    null);
+                players[i] = new Player(colors[i % colors.Count],
+                    int.Parse(pos[0]),
+                    int.Parse(pos[1]),
+                    Instantiate(head));
             }
 
             nbTours = lines.Length - (nbPlayers + 3);
@@ -58,7 +73,7 @@ namespace Script
                 var moves = lines[nbPlayers + 3 + i].Split(' ');
                 for (var p = 0; p < nbPlayers; p++)
                 {
-                    players[p].AddTrail((Direction) int.Parse(moves[p]), (float) i / nbTours,
+                    players[p].AddTrail(int.Parse(moves[p]), (float) i / nbTours,
                         (float) (i + 1) / nbTours);
                 }
             }
@@ -74,6 +89,33 @@ namespace Script
             {
                 p.TimelineUpdate(t);
             }
+
+            texture.Apply();
+        }
+
+
+        public static int GridToImage(float pos)
+        {
+            var mod = sizeMap + 1;
+            //pos = (pos % mod + mod) % mod;
+            return (int) (pos * Unit - Trail.WIDTH / 2);
+        }
+
+
+        public static void DrawRec(int x, int y, int width, int height, Color color)
+        {
+            for (var i = x; i < x + width; i++)
+            {
+                for (var j = y; j < y + height; j++)
+                {
+                    instance.texture.SetPixel(i, j, color);
+                }
+            }
+        }
+
+        public static float GridToWorld(float pos)
+        {
+            return -1; //(pos / (sizeMap + 1) - Trail.WIDTH / (float) WIDTH) * 20;
         }
     }
 }
