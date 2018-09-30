@@ -20,12 +20,14 @@ namespace Script
         private readonly int startY;
         private readonly Transform head;
         private readonly List<Trail> trail = new List<Trail>();
+        private readonly int indexScoreboard;
 
-        public Player(Color color, int startX, int startY, LightFlicker head)
+        public Player(Color color, int startX, int startY, LightFlicker head, int indexScoreboard)
         {
             this.color = color;
             this.startX = startX;
             this.startY = startY;
+            this.indexScoreboard = indexScoreboard;
             this.head = head.transform;
             xInstantiate = startX;
             yInstantiate = startY;
@@ -54,11 +56,11 @@ namespace Script
                 return;
             }
 
-            var dir_ = (Direction) dir;
-            if (trail.Count == 0 || dir_ != direction)
+            var dirTmp = (Direction) dir;
+            if (trail.Count == 0 || dirTmp != direction)
             {
-                trail.Add(new Trail(xInstantiate, yInstantiate, start, end, dir_, color));
-                direction = dir_;
+                trail.Add(new Trail(xInstantiate, yInstantiate, start, end, dirTmp, color));
+                direction = dirTmp;
             }
             else
             {
@@ -98,7 +100,9 @@ namespace Script
                 trail[i]?.TimelineUpdate(t);
             previousTime = t;
             if (trail[index] != null)
-                head.position = trail[index].GetPos();
+                Scoreboard.SetAlive(indexScoreboard);//head.position = trail[index].GetPos();
+            else
+                Scoreboard.SetDead(indexScoreboard);
         }
     }
 }

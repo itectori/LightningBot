@@ -1,46 +1,61 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Scoreboard : MonoBehaviour {
-    public string[] pTab;
-    public Color[] cTab;
+namespace Script
+{
+    public class Scoreboard : MonoBehaviour
+    {
+        private static string[] pTab;
+        private static Color[] cTab;
+        private static Color[] deadColors;
+        private static bool[] alive;
+        private static TMPro.TextMeshProUGUI tmpro;
 
-    private TMPro.TextMeshProUGUI Tmpro;
+        private void Start()
+        {
+            tmpro = GetComponent<TMPro.TextMeshProUGUI>();
+            if (cTab != null)
+                DrawPlayers();
+        }
 
-    // Use this for initialization
-	IEnumerator Start () {
-        Tmpro = GetComponent<TMPro.TextMeshProUGUI>();
-        SetPlayers(new string []{"Itectori", "Dayblox", "Luka", "Jilowyn", "Retsila", "Findus", "Dahll", "Valou", "Nano", "Jaky"}, ColorMaker.DivideColors(10));
-        yield return new WaitForSeconds(2);
-        
-        SetDead(2);
-        yield return new WaitForSeconds(1);
-        SetDead(1);
+        public static void SetPlayers(string[] allPlayers, Color[] colorTab)
+        {
+            pTab = allPlayers;
+            cTab = colorTab;
+            alive = new bool[allPlayers.Length];
+            deadColors = new Color[allPlayers.Length];
+            for (var i = 0; i < allPlayers.Length; i++)
+            {
+                alive[i] = true;
+                deadColors[i] = ColorMaker.ChangeColorToDead(cTab[i]);
+            }
 
-	}
-    public void SetPlayers(string[] allPlayers, Color[] colorTab)
-    {
-        pTab = allPlayers;
-        cTab = colorTab;
-        DrawPlayers();
-    }
-    private Color changeColorToDead(Color c)
-    {
-        float H, S, V = 0f;
-        Color.RGBToHSV(c,out H,out S,out V);
-        return Color.HSVToRGB(H, S, 0.25f);
-    }
-    private void DrawPlayers()
-    {
-        Tmpro.text = "";
-        for(var i = 0; i < pTab.Length; ++i)
-            if (pTab[i] != "")
-                Tmpro.text +=ColorMaker.GetColoredText(pTab[i], cTab[i]) + '\n';
-    }
-    public void SetDead(uint index)
-    {
-        cTab[index] = changeColorToDead(cTab[index]);
-        DrawPlayers();
+            if (tmpro)
+                DrawPlayers();
+        }
+
+        private static void DrawPlayers()
+        {
+            tmpro.text = "";
+            for (var i = 0; i < pTab.Length; ++i)
+                tmpro.text += ColorMaker.GetColoredText(pTab[i],
+                                  alive[i] ? cTab[i] : deadColors[i]
+                              ) + '\n';
+        }
+
+        public static void SetDead(int index)
+        {
+            if (!alive[index])
+                return;
+            alive[index] = false;
+            DrawPlayers();
+        }
+
+        public static void SetAlive(int index)
+        {
+            if (alive[index])
+                return;
+            alive[index] = true;
+            DrawPlayers();
+        }
     }
 }

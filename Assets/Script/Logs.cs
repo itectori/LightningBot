@@ -2,84 +2,87 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Logs : MonoBehaviour {
-    TMPro.TextMeshProUGUI[] textList;
-    private int listIndex;
-    Queue<string> queue;
-	// Use this for initialization
-	void Start () {
-        textList = GetComponentsInChildren<TMPro.TextMeshProUGUI>(true);
-        print(textList.Length);
+namespace Script
+{
+    public class Logs : MonoBehaviour {
+        TMPro.TextMeshProUGUI[] textList;
+        private int listIndex;
+        Queue<string> queue;
+        // Use this for initialization
+        void Start () {
+            textList = GetComponentsInChildren<TMPro.TextMeshProUGUI>(true);
+            print(textList.Length);
 
-        queue = new Queue<string>();
-        StartCoroutine(LogsCor());
-        queue.Enqueue("PlayerX shot PlayerY");
-        queue.Enqueue("PlayerX Disconnected");
-        queue.Enqueue("PlayerX wants to go up");
-        queue.Enqueue("<#ffff80>PlayerX</color> go up");
-        queue.Enqueue("<#ffff80>PlayerX</color> killed <#4775FF>Player Y</color>");
-        queue.Enqueue("<#ffff80>PlayerX</color> go up");
-        queue.Enqueue("<#ffff80>PlayerX</color> go up");
-        queue.Enqueue("<#ffff80>PlayerX</color> go up");
-        queue.Enqueue("<#ffff80>PlayerX</color> go right");
-        queue.Enqueue("<#ffff80>PlayerX</color> go right");
-        queue.Enqueue("<#ffff80>PlayerX</color> go left");
-        queue.Enqueue("<#ffff80>PlayerX</color> go up");
-        queue.Enqueue("<#ffff80>PlayerX</color> go down");
-        queue.Enqueue("<#ffff80>PlayerX</color> go up");
-        queue.Enqueue("<#ffff80>PlayerX</color> go up");
-        queue.Enqueue("<#ffff80>PlayerX</color> go Left");
-        queue.Enqueue(ColorMaker.GetColoredText("PlayerX", Color.cyan)+" go up");
+            queue = new Queue<string>();
+            StartCoroutine(LogsCor());
+            queue.Enqueue("PlayerX shot PlayerY");
+            queue.Enqueue("PlayerX Disconnected");
+            queue.Enqueue("PlayerX wants to go up");
+            queue.Enqueue("<#ffff80>PlayerX</color> go up");
+            queue.Enqueue("<#ffff80>PlayerX</color> killed <#4775FF>Player Y</color>");
+            queue.Enqueue("<#ffff80>PlayerX</color> go up");
+            queue.Enqueue("<#ffff80>PlayerX</color> go up");
+            queue.Enqueue("<#ffff80>PlayerX</color> go up");
+            queue.Enqueue("<#ffff80>PlayerX</color> go right");
+            queue.Enqueue("<#ffff80>PlayerX</color> go right");
+            queue.Enqueue("<#ffff80>PlayerX</color> go left");
+            queue.Enqueue("<#ffff80>PlayerX</color> go up");
+            queue.Enqueue("<#ffff80>PlayerX</color> go down");
+            queue.Enqueue("<#ffff80>PlayerX</color> go up");
+            queue.Enqueue("<#ffff80>PlayerX</color> go up");
+            queue.Enqueue("<#ffff80>PlayerX</color> go Left");
+            queue.Enqueue(ColorMaker.GetColoredText("PlayerX", Color.cyan)+" go up");
 
-    }
+        }
 	
-	public void SendLog(string log)
-    {
-        queue.Enqueue(log);
-    }
-
-
-    private TMPro.TextMeshProUGUI getAText()
-    {
-        var toRet = textList[listIndex];
-        listIndex = ++listIndex % 10;
-        return toRet;
-    }
-    
-    IEnumerator LogsCor()
-    {
-        string log = null;
-        while(true)
+        public void SendLog(string log)
         {
-            if (queue.Count != 0)
+            queue.Enqueue(log);
+        }
+
+
+        private TMPro.TextMeshProUGUI getAText()
+        {
+            var toRet = textList[listIndex];
+            listIndex = ++listIndex % 10;
+            return toRet;
+        }
+    
+        IEnumerator LogsCor()
+        {
+            string log = null;
+            while(true)
             {
-                log = queue.Dequeue();
-                foreach (var t in textList)
+                if (queue.Count != 0)
                 {
-                    t.rectTransform.localPosition = new Vector3(t.rectTransform.localPosition.x, t.rectTransform.localPosition.y + 15);
-                }
-                
-                var container = getAText();
-                container.rectTransform.localPosition = new Vector3(container.rectTransform.localPosition.x, -95);
-                container.text = "";
-                container.gameObject.SetActive(true);
-                for (int i = 0; i < log.Length; ++i)
-                {
-                    if (log[i] == '<')
+                    log = queue.Dequeue();
+                    foreach (var t in textList)
                     {
-                        string tag = "";
-                        for (; log[i] != '>' && i < log.Length; ++i)
-                        {
-                            tag += log[i];
-                        }
-                        container.text += tag + log[i];
+                        t.rectTransform.localPosition = new Vector3(t.rectTransform.localPosition.x, t.rectTransform.localPosition.y + 15);
                     }
-                    else
-                        container.text += log[i];
-                    yield return new WaitForSeconds(0.01f);
+                
+                    var container = getAText();
+                    container.rectTransform.localPosition = new Vector3(container.rectTransform.localPosition.x, -95);
+                    container.text = "";
+                    container.gameObject.SetActive(true);
+                    for (int i = 0; i < log.Length; ++i)
+                    {
+                        if (log[i] == '<')
+                        {
+                            string tag = "";
+                            for (; log[i] != '>' && i < log.Length; ++i)
+                            {
+                                tag += log[i];
+                            }
+                            container.text += tag + log[i];
+                        }
+                        else
+                            container.text += log[i];
+                        yield return new WaitForSeconds(0.01f);
+                    }
                 }
+                yield return null;
             }
-            yield return null;
         }
     }
 }

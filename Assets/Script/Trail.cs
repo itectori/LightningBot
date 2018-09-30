@@ -62,7 +62,7 @@ namespace Script
             }
         }
 
-        private void DrawTrail(float length, Color color)
+        private void DrawTrail(float length, Color drawColor)
         {
             var sizePx = (int) (length * size * GameManager.Unit);
             switch (dir)
@@ -73,7 +73,7 @@ namespace Script
                         GameManager.GridToImage(y),
                         sizePx,
                         WIDTH,
-                        color);
+                        drawColor);
                     break;
                 case Direction.Down:
                     GameManager.DrawRec(
@@ -81,7 +81,7 @@ namespace Script
                         GameManager.GridToImage(y) - sizePx,
                         WIDTH,
                         sizePx,
-                        color);
+                        drawColor);
                     break;
                 case Direction.Left:
                     GameManager.DrawRec(
@@ -89,7 +89,7 @@ namespace Script
                         GameManager.GridToImage(y),
                         sizePx,
                         WIDTH,
-                        color);
+                        drawColor);
                     break;
                 case Direction.Up:
                     GameManager.DrawRec(
@@ -97,7 +97,7 @@ namespace Script
                         GameManager.GridToImage(y) + WIDTH,
                         WIDTH,
                         sizePx,
-                        color);
+                        drawColor);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

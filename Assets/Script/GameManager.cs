@@ -1,20 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System.Xml;
-using UnityEditor;
+using System.Linq;
 using Color = UnityEngine.Color;
 
 namespace Script
 {
     public class GameManager : ATimelineDependent
     {
+        private struct ColorPlayer : IComparable
+        {
+            public readonly string Name;
+            public readonly Color Color;
+            public readonly int Index;
+
+            public ColorPlayer(string name, Color color, int index)
+            {
+                Name = name;
+                Color = color;
+                Index = index;
+            }
+
+            public static int operator <(ColorPlayer p1, ColorPlayer p2)
+            {
+                return string.Compare(p1.Name, p2.Name, StringComparison.Ordinal);
+            }
+
+            public static int operator >(ColorPlayer p1, ColorPlayer p2)
+            {
+                return p2 < p1;
+            }
+
+            public int CompareTo(object obj)
+            {
+                return obj is ColorPlayer ? string.Compare(Name, ((ColorPlayer)obj).Name, StringComparison.Ordinal) : 0;
+            }
+        }
+        
         public static readonly Color32 Clear = Color.black;
 
         private const int WIDTH = 1024;
 
         [SerializeField] private Texture2D texture;
-        [SerializeField] private List<Color32> colors;
         [SerializeField] private bool local;
         [SerializeField] private string url;
         [SerializeField] private LightFlicker head;
@@ -50,18 +78,38 @@ namespace Script
         private void ParseGameInfo(string s)
         {
             lines = s.Split('\n');
-            nbPlayers = lines[0].Split(' ').Length;
+            var playersName = lines[0].Split(' ').ToList();
+            nbPlayers = playersName.Count;
+            var colors = ColorMaker.DivideColors((uint) nbPlayers);
+
+            var sortPlayers = new List<ColorPlayer>();
+            for (var i = 0; i < nbPlayers; i++)
+            {
+                sortPlayers.Add(new ColorPlayer(playersName[i], colors[i], i));
+            }
+
+            sortPlayers.Sort();
+            playersName.Clear();
+            var sortedColors = new Color[nbPlayers];
+            for (var i = 0; i < nbPlayers; i++)
+            {
+                playersName.Add(sortPlayers[i].Name);
+                sortedColors[i] = sortPlayers[i].Color;
+            }
+            
             sizeMap = int.Parse(lines[1]);
             TimeTurn = int.Parse(lines[2]);
             Unit = WIDTH / (float) sizeMap;
             players = new Player[nbPlayers];
+            Scoreboard.SetPlayers(playersName.ToArray(), sortedColors);
             for (var i = 0; i < nbPlayers; i++)
             {
                 var pos = lines[i + 3].Split(' ');
-                players[i] = new Player(colors[i % colors.Count],
+                players[i] = new Player(colors[i],
                     int.Parse(pos[0]),
                     int.Parse(pos[1]),
-                    Instantiate(head));
+                    Instantiate(head),
+                    sortPlayers.FindIndex(c => c.Index == i));
             }
 
             nbTours = lines.Length - (nbPlayers + 3);
@@ -96,6 +144,7 @@ namespace Script
 
         public static int GridToImage(float pos)
         {
+            // ReSharper disable once PossibleLossOfFraction
             return (int) (pos * Unit - Trail.WIDTH / 2);
         }
 
