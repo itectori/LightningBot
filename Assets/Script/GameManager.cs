@@ -53,7 +53,7 @@ namespace Script
             nbPlayers = lines[0].Split(' ').Length;
             sizeMap = int.Parse(lines[1]);
             TimeTurn = int.Parse(lines[2]);
-            Unit = WIDTH / (float) (sizeMap + 1);
+            Unit = WIDTH / (float) sizeMap;
             players = new Player[nbPlayers];
             for (var i = 0; i < nbPlayers; i++)
             {
@@ -96,8 +96,6 @@ namespace Script
 
         public static int GridToImage(float pos)
         {
-            var mod = sizeMap + 1;
-            //pos = (pos % mod + mod) % mod;
             return (int) (pos * Unit - Trail.WIDTH / 2);
         }
 
@@ -115,7 +113,7 @@ namespace Script
 
         public static float GridToWorld(float pos)
         {
-            return -1; //(pos / (sizeMap + 1) - Trail.WIDTH / (float) WIDTH) * 20;
+            return -1; //(pos / Unit - Trail.WIDTH / (float) WIDTH) * 20;
         }
     }
 }
