@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Remoting;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Script
@@ -16,7 +13,9 @@ namespace Script
         private Animation anim;
         private const float TIME_TO_WAIT = 1.5f;
         private float lastTime;
+        private float lastValue;
         private bool active = true;
+        private bool changing = false;
 
         private void Start()
         {
@@ -46,9 +45,16 @@ namespace Script
 
             if (GameManager.Ready)
             {
-                slider.value += Time.deltaTime / GameManager.TotalDuration * 2 * GameManager.TimeTurn;
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (lastValue != slider.value)
+                    changing = true;
+                if (!changing)
+                    slider.value += Time.deltaTime / GameManager.TotalDuration * 2 * GameManager.TimeTurn;
+                else if (Input.GetMouseButtonUp(0))
+                    changing = false;
                 foreach (var d in dependences)
                     d.TimelineUpdate(slider.value);
+                lastValue = slider.value;
             }
         }
 
