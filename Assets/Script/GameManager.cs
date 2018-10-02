@@ -22,16 +22,6 @@ namespace Script
                 Index = index;
             }
 
-            public static int operator <(ColorPlayer p1, ColorPlayer p2)
-            {
-                return string.Compare(p1.Name, p2.Name, StringComparison.Ordinal);
-            }
-
-            public static int operator >(ColorPlayer p1, ColorPlayer p2)
-            {
-                return p2 < p1;
-            }
-
             public int CompareTo(object obj)
             {
                 return obj is ColorPlayer ? string.Compare(Name, ((ColorPlayer)obj).Name, StringComparison.Ordinal) : 0;
@@ -145,7 +135,7 @@ namespace Script
         public static int GridToImage(float pos)
         {
             // ReSharper disable once PossibleLossOfFraction
-            return (int) (pos * Unit - Trail.WIDTH / 2);
+            return (int) (pos * Unit);
         }
 
 
