@@ -36,11 +36,6 @@ namespace Script
             size++;
         }
 
-        public Vector3 GetPos()
-        {
-            return new Vector3(GameManager.GridToWorld(x), 1 , GameManager.GridToWorld(y));
-        }
-
         private float lastLenght;
         public void TimelineUpdate(float t)
         {
@@ -99,6 +94,23 @@ namespace Script
                         sizePx,
                         drawColor);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+        
+        public Vector3 GetPos()
+        {
+            switch (dir)
+            {
+                case Direction.Right:
+                    return new Vector3(GameManager.GridToWorld(x + lastLenght * size), 1 , GameManager.GridToWorld(y));
+                case Direction.Down:
+                    return new Vector3(GameManager.GridToWorld(x), 1 , GameManager.GridToWorld(y - lastLenght * size));
+                case Direction.Left:
+                    return new Vector3(GameManager.GridToWorld(x - lastLenght * size), 1 , GameManager.GridToWorld(y));
+                case Direction.Up:
+                    return new Vector3(GameManager.GridToWorld(x), 1 , GameManager.GridToWorld(y + lastLenght * size));
                 default:
                     throw new ArgumentOutOfRangeException();
             }

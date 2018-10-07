@@ -24,10 +24,12 @@ namespace Script
 
             public int CompareTo(object obj)
             {
-                return obj is ColorPlayer ? string.Compare(Name, ((ColorPlayer)obj).Name, StringComparison.Ordinal) : 0;
+                return obj is ColorPlayer
+                    ? string.Compare(Name, ((ColorPlayer) obj).Name, StringComparison.Ordinal)
+                    : 0;
             }
         }
-        
+
         public static readonly Color32 Clear = Color.black;
 
         private const int WIDTH = 1024;
@@ -35,7 +37,7 @@ namespace Script
         [SerializeField] private Texture2D texture;
         [SerializeField] private bool local;
         [SerializeField] private string url;
-        [SerializeField] private LightFlicker head;
+        [SerializeField] private GameObject head;
 
         public static int TotalDuration;
         public static int TimeTurn;
@@ -86,7 +88,7 @@ namespace Script
                 playersName.Add(sortPlayers[i].Name);
                 sortedColors[i] = sortPlayers[i].Color;
             }
-            
+
             sizeMap = int.Parse(lines[1]);
             TimeTurn = int.Parse(lines[2]);
             Unit = WIDTH / (float) sizeMap;
@@ -98,7 +100,7 @@ namespace Script
                 players[i] = new Player(colors[i],
                     int.Parse(pos[0]),
                     int.Parse(pos[1]),
-                    Instantiate(head),
+                    Instantiate(head, transform.parent),
                     sortPlayers.FindIndex(c => c.Index == i));
             }
 
@@ -134,7 +136,6 @@ namespace Script
 
         public static int GridToImage(float pos)
         {
-            // ReSharper disable once PossibleLossOfFraction
             return (int) (pos * Unit);
         }
 
@@ -152,7 +153,7 @@ namespace Script
 
         public static float GridToWorld(float pos)
         {
-            return -1; //(pos / Unit - Trail.WIDTH / (float) WIDTH) * 20;
+            return ((pos / sizeMap + (float)Trail.WIDTH / WIDTH / 2f) * 18f % 18 + 18) % 18;
         }
     }
 }
