@@ -42,7 +42,6 @@ namespace Script
         public static int TotalDuration;
         public static int TimeTurn;
         public static bool Ready;
-
         private static int nbPlayers;
         private static int sizeMap;
         public static float Unit;
@@ -50,24 +49,41 @@ namespace Script
         private static Player[] players;
         private static int nbTours;
         private static GameManager instance;
+        private static float scaleMap;
 
         private void Start()
         {
             instance = this;
+            scaleMap = transform.localScale.x;
+            GetComponent<Renderer>().material.mainTexture = texture;
+            ClearGame();
+            if (local)
+                ParseGameSave(File.ReadAllText(url));
+        }
+
+        public static void NewGame(string game)
+        {
+            Ready = false;
+            instance.ClearGame();
+            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".save", instance.ParseGameSave));
+            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".logs", instance.ParseGameLogs));
+        }
+
+        private void ClearGame()
+        {
             var fillColorArray = texture.GetPixels();
             for (var i = 0; i < fillColorArray.Length; ++i)
                 fillColorArray[i] = Clear;
             texture.SetPixels(fillColorArray);
             texture.Apply();
-            GetComponent<Renderer>().material.mainTexture = texture;
-
-            if (local)
-                ParseGameInfo(File.ReadAllText(url));
-            else
-                StartCoroutine(Tools.WebRequest(url, ParseGameInfo));
         }
 
-        private void ParseGameInfo(string s)
+        private void ParseGameLogs(string s)
+        {
+            Debug.Log(s);
+        }
+
+        private void ParseGameSave(string s)
         {
             lines = s.Split('\n');
             var playersName = lines[0].Split(' ').ToList();
@@ -153,7 +169,7 @@ namespace Script
 
         public static float GridToWorld(float pos)
         {
-            return ((pos / sizeMap + (float)Trail.WIDTH / WIDTH / 2f) * 18f % 18 + 18) % 18;
+            return ((pos / sizeMap + (float)Trail.WIDTH / WIDTH / 2f) * scaleMap % scaleMap + scaleMap) % scaleMap;
         }
     }
 }
