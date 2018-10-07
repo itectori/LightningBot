@@ -22,22 +22,14 @@ namespace Script
                 Index = index;
             }
 
-            public static int operator <(ColorPlayer p1, ColorPlayer p2)
-            {
-                return string.Compare(p1.Name, p2.Name, StringComparison.Ordinal);
-            }
-
-            public static int operator >(ColorPlayer p1, ColorPlayer p2)
-            {
-                return p2 < p1;
-            }
-
             public int CompareTo(object obj)
             {
-                return obj is ColorPlayer ? string.Compare(Name, ((ColorPlayer)obj).Name, StringComparison.Ordinal) : 0;
+                return obj is ColorPlayer
+                    ? string.Compare(Name, ((ColorPlayer) obj).Name, StringComparison.Ordinal)
+                    : 0;
             }
         }
-        
+
         public static readonly Color32 Clear = Color.black;
 
         private const int WIDTH = 1024;
@@ -45,12 +37,11 @@ namespace Script
         [SerializeField] private Texture2D texture;
         [SerializeField] private bool local;
         [SerializeField] private string url;
-        [SerializeField] private LightFlicker head;
+        [SerializeField] private GameObject head;
 
         public static int TotalDuration;
         public static int TimeTurn;
         public static bool Ready;
-
         private static int nbPlayers;
         private static int sizeMap;
         public static float Unit;
@@ -58,24 +49,41 @@ namespace Script
         private static Player[] players;
         private static int nbTours;
         private static GameManager instance;
+        private static float scaleMap;
 
         private void Start()
         {
             instance = this;
+            scaleMap = transform.localScale.x;
+            GetComponent<Renderer>().material.mainTexture = texture;
+            ClearGame();
+            if (local)
+                ParseGameSave(File.ReadAllText(url));
+        }
+
+        public static void NewGame(string game)
+        {
+            Ready = false;
+            instance.ClearGame();
+            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".save", instance.ParseGameSave));
+            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".logs", instance.ParseGameLogs));
+        }
+
+        private void ClearGame()
+        {
             var fillColorArray = texture.GetPixels();
             for (var i = 0; i < fillColorArray.Length; ++i)
                 fillColorArray[i] = Clear;
             texture.SetPixels(fillColorArray);
             texture.Apply();
-            GetComponent<Renderer>().material.mainTexture = texture;
-
-            if (local)
-                ParseGameInfo(File.ReadAllText(url));
-            else
-                StartCoroutine(Tools.WebRequest(url, ParseGameInfo));
         }
 
-        private void ParseGameInfo(string s)
+        private void ParseGameLogs(string s)
+        {
+            Debug.Log(s);
+        }
+
+        private void ParseGameSave(string s)
         {
             lines = s.Split('\n');
             var playersName = lines[0].Split(' ').ToList();
@@ -98,7 +106,7 @@ namespace Script
                 playersName.Add(sortPlayers[i].Name);
                 sortedColors[i] = sortPlayers[i].Color;
             }
-            
+
             sizeMap = int.Parse(lines[1]);
             TimeTurn = int.Parse(lines[2]);
             Unit = WIDTH / (float) sizeMap;
@@ -110,7 +118,7 @@ namespace Script
                 players[i] = new Player(colors[i],
                     int.Parse(pos[0]),
                     int.Parse(pos[1]),
-                    Instantiate(head),
+                    Instantiate(head, transform.parent),
                     sortPlayers.FindIndex(c => c.Index == i));
             }
 
@@ -146,8 +154,7 @@ namespace Script
 
         public static int GridToImage(float pos)
         {
-            // ReSharper disable once PossibleLossOfFraction
-            return (int) (pos * Unit - Trail.WIDTH / 2);
+            return (int) (pos * Unit);
         }
 
 
@@ -164,7 +171,7 @@ namespace Script
 
         public static float GridToWorld(float pos)
         {
-            return -1; //(pos / Unit - Trail.WIDTH / (float) WIDTH) * 20;
+            return ((pos / sizeMap + (float)Trail.WIDTH / WIDTH / 2f) * scaleMap % scaleMap + scaleMap) % scaleMap;
         }
     }
 }

@@ -21,8 +21,10 @@ namespace Script
         private readonly Transform head;
         private readonly List<Trail> trail = new List<Trail>();
         private readonly int indexScoreboard;
+        private bool indestructible;
+        private bool dead = false;
 
-        public Player(Color color, int startX, int startY, LightFlicker head, int indexScoreboard)
+        public Player(Color color, int startX, int startY, GameObject head, int indexScoreboard)
         {
             this.color = color;
             this.startX = startX;
@@ -39,9 +41,8 @@ namespace Script
                 GameManager.GridToWorld(xInstantiate),
                 1,
                 GameManager.GridToWorld(yInstantiate));
-            head.SetColor(color);
+            //head.SetColor(color);
         }
-
 
         private Direction direction;
         private float previousTime;
@@ -53,6 +54,8 @@ namespace Script
             if (dir < 0)
             {
                 trail.Add(null);
+                if (dir == -1)
+                    indestructible = true;
                 return;
             }
 
@@ -88,6 +91,7 @@ namespace Script
             }
         }
 
+        private int lastNotNull;
         public void TimelineUpdate(float t)
         {
             var prevIndex = (int) (previousTime * trail.Count);
@@ -97,12 +101,38 @@ namespace Script
             var start = prevIndex > index ? index : prevIndex;
             var end = prevIndex > index ? prevIndex : index;
             for (var i = start; i <= end; i++)
-                trail[i]?.TimelineUpdate(t);
+                if (trail[i] != null)
+                {
+                    lastNotNull = i;
+                    trail[i]?.TimelineUpdate(t);
+                }
             previousTime = t;
-            if (trail[index] != null)
-                Scoreboard.SetAlive(indexScoreboard);//head.position = trail[index].GetPos();
+            if (trail[index] != null || indestructible)
+            {
+                if (dead)
+                    OnAlive();
+            }
             else
-                Scoreboard.SetDead(indexScoreboard);
+            {
+                if (!dead)
+                    OnDead();
+            }
+            if (!dead)
+                head.localPosition = trail[lastNotNull].GetPos();
+        }
+
+        private void OnAlive()
+        {
+            dead = false;
+            Scoreboard.SetAlive(indexScoreboard);
+            head.gameObject.SetActive(true);
+        }
+
+        private void OnDead()
+        {
+            dead = true;
+            Scoreboard.SetDead(indexScoreboard);
+            head.gameObject.SetActive(false);
         }
     }
 }
