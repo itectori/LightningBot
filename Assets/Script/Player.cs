@@ -21,6 +21,7 @@ namespace Script
         private readonly Transform head;
         private readonly List<Trail> trail = new List<Trail>();
         private readonly int indexScoreboard;
+        private bool indestructible;
 
         public Player(Color color, int startX, int startY, LightFlicker head, int indexScoreboard)
         {
@@ -42,7 +43,6 @@ namespace Script
             head.SetColor(color);
         }
 
-
         private Direction direction;
         private float previousTime;
         private int xInstantiate;
@@ -53,6 +53,8 @@ namespace Script
             if (dir < 0)
             {
                 trail.Add(null);
+                if (dir == -1)
+                    indestructible = true;
                 return;
             }
 
@@ -99,8 +101,8 @@ namespace Script
             for (var i = start; i <= end; i++)
                 trail[i]?.TimelineUpdate(t);
             previousTime = t;
-            if (trail[index] != null)
-                Scoreboard.SetAlive(indexScoreboard);//head.position = trail[index].GetPos();
+            if (trail[index] != null || indestructible)
+                Scoreboard.SetAlive(indexScoreboard); //head.position = trail[index].GetPos();
             else
                 Scoreboard.SetDead(indexScoreboard);
         }
