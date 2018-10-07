@@ -9,7 +9,7 @@ namespace Script
             var d = 360f / nbPlayers;
             var tab = new Color[nbPlayers];
             for(uint i = 0; i < nbPlayers; ++i)
-                tab[i] = Color.HSVToRGB(d * i/360f , 69f/100f, 1);
+                tab[i] = Color.HSVToRGB(d * i/360f , 64f/100f, 1);
         
             return tab;
         }

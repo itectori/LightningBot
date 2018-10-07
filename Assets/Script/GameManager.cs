@@ -81,6 +81,8 @@ namespace Script
             var playersName = lines[0].Split(' ').ToList();
             nbPlayers = playersName.Count;
             var colors = ColorMaker.DivideColors((uint) nbPlayers);
+            foreach (var c in colors)
+                print(c);
 
             var sortPlayers = new List<ColorPlayer>();
             for (var i = 0; i < nbPlayers; i++)
