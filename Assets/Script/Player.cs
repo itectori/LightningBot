@@ -41,7 +41,7 @@ namespace Script
                 GameManager.GridToWorld(xInstantiate),
                 1,
                 GameManager.GridToWorld(yInstantiate));
-            //head.SetColor(color);
+            head.GetComponentInChildren<ParticleSystem>().startColor = color;
         }
 
         private Direction direction;
@@ -104,7 +104,7 @@ namespace Script
                 if (trail[i] != null)
                 {
                     lastNotNull = i;
-                    trail[i]?.TimelineUpdate(t);
+                    trail[i].TimelineUpdate(t);
                 }
             previousTime = t;
             if (trail[index] != null || indestructible)

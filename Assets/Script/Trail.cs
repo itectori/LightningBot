@@ -104,13 +104,13 @@ namespace Script
             switch (dir)
             {
                 case Direction.Right:
-                    return new Vector3(GameManager.GridToWorld(x + lastLenght * size), 1 , GameManager.GridToWorld(y));
+                    return new Vector3(GameManager.GridToWorld(x + lastLenght * size), 0 , GameManager.GridToWorld(y));
                 case Direction.Down:
-                    return new Vector3(GameManager.GridToWorld(x), 1 , GameManager.GridToWorld(y - lastLenght * size));
+                    return new Vector3(GameManager.GridToWorld(x), 0 , GameManager.GridToWorld(y - lastLenght * size));
                 case Direction.Left:
-                    return new Vector3(GameManager.GridToWorld(x - lastLenght * size), 1 , GameManager.GridToWorld(y));
+                    return new Vector3(GameManager.GridToWorld(x - lastLenght * size), 0 , GameManager.GridToWorld(y));
                 case Direction.Up:
-                    return new Vector3(GameManager.GridToWorld(x), 1 , GameManager.GridToWorld(y + lastLenght * size));
+                    return new Vector3(GameManager.GridToWorld(x), 0 , GameManager.GridToWorld(y + lastLenght * size));
                 default:
                     throw new ArgumentOutOfRangeException();
             }

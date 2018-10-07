@@ -41,7 +41,6 @@ namespace Script
 
         public static int TotalDuration;
         public static int TimeTurn;
-        public static bool Ready;
         private static int nbPlayers;
         private static int sizeMap;
         public static float Unit;
@@ -50,6 +49,10 @@ namespace Script
         private static int nbTours;
         private static GameManager instance;
         private static float scaleMap;
+        private static bool readySave;
+        private static bool readyLogs;
+
+        public static bool Ready => readySave && readyLogs;
 
         private void Start()
         {
@@ -58,15 +61,21 @@ namespace Script
             GetComponent<Renderer>().material.mainTexture = texture;
             ClearGame();
             if (local)
+            {
                 ParseGameSave(File.ReadAllText(url));
+                readyLogs = true;
+            }
         }
 
         public static void NewGame(string game)
         {
-            Ready = false;
+            readySave = false;
+            readyLogs = false;
             instance.ClearGame();
-            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".save", instance.ParseGameSave));
-            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".logs", instance.ParseGameLogs));
+            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".save",
+                instance.ParseGameSave));
+            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".logs",
+                instance.ParseGameLogs));
         }
 
         private void ClearGame()
@@ -81,6 +90,7 @@ namespace Script
         private void ParseGameLogs(string s)
         {
             Debug.Log(s);
+            readyLogs = true;
         }
 
         private void ParseGameSave(string s)
@@ -136,12 +146,12 @@ namespace Script
                 }
             }
 
-            Ready = true;
+            readySave = true;
         }
 
         public override void TimelineUpdate(float t)
         {
-            if (!Ready)
+            if (!readySave)
                 return;
             foreach (var p in players)
             {
@@ -171,7 +181,7 @@ namespace Script
 
         public static float GridToWorld(float pos)
         {
-            return ((pos / sizeMap + (float)Trail.WIDTH / WIDTH / 2f) * scaleMap % scaleMap + scaleMap) % scaleMap;
+            return ((pos / sizeMap + (float) Trail.WIDTH / WIDTH / 2f) * scaleMap % scaleMap + scaleMap) % scaleMap;
         }
     }
 }
