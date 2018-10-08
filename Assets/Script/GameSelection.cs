@@ -75,6 +75,7 @@ public class GameSelection : MonoBehaviour {
         else
         {
             itemAnim.HideAllItems();
+            itemAnim.SetChildrenText(filteredTab);
             itemAnim.ShowItem(filteredTab.Length);
         }
     }
