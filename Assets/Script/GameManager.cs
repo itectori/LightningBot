@@ -72,9 +72,9 @@ namespace Script
             readySave = false;
             readyLogs = false;
             instance.ClearGame();
-            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".save",
+            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/games/" + game,
                 instance.ParseGameSave));
-            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/" + game + ".logs",
+            instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/logs/" + game,
                 instance.ParseGameLogs));
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using Script;
 
 public class GameSelection : MonoBehaviour {
     [SerializeField]
@@ -88,7 +89,7 @@ public class GameSelection : MonoBehaviour {
     {
         StartCoroutine(UnDeploy());
         itemAnim.HideAllItems();
-        return;
+        GameManager.NewGame(name);
     }
     IEnumerator Deploy()
     {
