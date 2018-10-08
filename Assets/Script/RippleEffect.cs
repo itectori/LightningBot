@@ -5,7 +5,7 @@ public class RippleEffect : MonoBehaviour
 {
     public AnimationCurve waveform = new AnimationCurve(
         new Keyframe(0.00f, 0.50f, 0, 0),
-        new Keyframe(0.05f, 1.00f, 0, 0),
+        new Keyframe(0.05f, 0.80f, 0, 0),
         new Keyframe(0.15f, 0.50f, 0, 0),
         new Keyframe(0.99f, 0.50f, 0, 0)
     );
