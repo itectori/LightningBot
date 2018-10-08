@@ -22,8 +22,7 @@ public class GameSelection : MonoBehaviour {
 	void Start () {
         startpos = selector.rectTransform.position;
         endpos = startpos +  new Vector3(182, 0, 0);
-        
-        
+	    OnClickSearcher();
 	}
 	
 	// Update is called once per frame
@@ -48,7 +47,7 @@ public class GameSelection : MonoBehaviour {
     }
     public void GetGames()
     {
-        StartCoroutine(Script.Tools.WebRequest("https://lightningbot.tk/games", SetGamesAndDisplay));
+        StartCoroutine(Script.Tools.WebRequest("https://lightningbot.tk/list", SetGamesAndDisplay));
 
     }
     private void SetGamesAndDisplay(string s)

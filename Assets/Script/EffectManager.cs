@@ -28,7 +28,6 @@ public class EffectManager : MonoBehaviour {
             instance.deathParticles[i].Emit(instance.numberParticles[i]);
         }
         worldPos = instance.cam.WorldToScreenPoint(worldPos);
-        print(worldPos);
         effect.reflectionColor = col;
         effect.Emit(new Vector3(worldPos.x/Screen.width, worldPos.y/Screen.height));
     }

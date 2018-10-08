@@ -69,6 +69,12 @@ namespace Script
 
         public static void NewGame(string game)
         {
+            Timeline.Reset();
+            if (players != null)
+                foreach (var p in players)
+                    p.Dispose();
+
+
             readySave = false;
             readyLogs = false;
             instance.ClearGame();
@@ -89,7 +95,6 @@ namespace Script
 
         private void ParseGameLogs(string s)
         {
-            Debug.Log(s);
             readyLogs = true;
         }
 
@@ -99,8 +104,6 @@ namespace Script
             var playersName = lines[0].Split(' ').ToList();
             nbPlayers = playersName.Count;
             var colors = ColorMaker.DivideColors((uint) nbPlayers);
-            foreach (var c in colors)
-                print(c);
 
             var sortPlayers = new List<ColorPlayer>();
             for (var i = 0; i < nbPlayers; i++)

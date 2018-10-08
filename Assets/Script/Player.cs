@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Script
 {
@@ -13,7 +14,7 @@ namespace Script
         Up = 3
     }
 
-    public class Player : ITimelineDepend
+    public class Player : ITimelineDepend, IDisposable
     {
         private readonly Color color;
         private readonly int startX;
@@ -92,6 +93,7 @@ namespace Script
         }
 
         private int lastNotNull;
+
         public void TimelineUpdate(float t)
         {
             var prevIndex = (int) (previousTime * trail.Count);
@@ -106,6 +108,7 @@ namespace Script
                     lastNotNull = i;
                     trail[i].TimelineUpdate(t);
                 }
+
             previousTime = t;
             if (!dead)
                 head.localPosition = trail[lastNotNull].GetPos();
@@ -134,6 +137,12 @@ namespace Script
             EffectManager.DeathAnim(head.position, color);
             Scoreboard.SetDead(indexScoreboard);
             head.gameObject.SetActive(false);
+        }
+
+        public void Dispose()
+        {
+            if (head)
+                Object.Destroy(head.gameObject);
         }
     }
 }

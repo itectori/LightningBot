@@ -17,8 +17,11 @@ namespace Script
         private bool active = true;
         private bool changing = false;
 
+        private static Timeline instance;
+
         private void Start()
         {
+            instance = this;
             slider = GetComponent<Slider>();
             anim = GetComponent<Animation>();
         }
@@ -56,6 +59,12 @@ namespace Script
                     d.TimelineUpdate(slider.value);
                 lastValue = slider.value;
             }
+        }
+
+        static public void Reset()
+        {
+            instance.slider.value = 0;
+            instance.lastValue = 0;
         }
 
         private void Activate()
