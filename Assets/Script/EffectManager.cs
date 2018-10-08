@@ -12,28 +12,25 @@ public class EffectManager : MonoBehaviour {
     [SerializeField]
     int[] numberParticles = { 1, 1, 5 };
     // Use this for initialization
-    IEnumerator Start()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(1);
-            DeathAnim();
-        }
-    }
 
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
-    public void DeathAnim()
+    public void DeathAnim(Vector3 worldPos, Color col)
     {
         
-        for(int i = 0; i < deathParticles.Length;++i)
+        for (int i = 0; i < deathParticles.Length;++i)
         {
-
+            var main = deathParticles[i].main;
+            main.startColor = col;
+            deathParticles[i].transform.position = worldPos;
             deathParticles[i].Emit(numberParticles[i]);
         }
-        ripple.Emit(new Vector2(0.5f, 0.5f));
+        worldPos = cam.WorldToScreenPoint(worldPos);
+        print(worldPos);
+        ripple.reflectionColor = col;
+        ripple.Emit(new Vector3(worldPos.x/Screen.width, worldPos.y/Screen.height));
     }
 }
