@@ -107,6 +107,8 @@ namespace Script
                     trail[i].TimelineUpdate(t);
                 }
             previousTime = t;
+            if (!dead)
+                head.localPosition = trail[lastNotNull].GetPos();
             if (trail[index] != null || indestructible)
             {
                 if (dead)
@@ -117,8 +119,6 @@ namespace Script
                 if (!dead)
                     OnDead();
             }
-            if (!dead)
-                head.localPosition = trail[lastNotNull].GetPos();
         }
 
         private void OnAlive()
@@ -131,6 +131,7 @@ namespace Script
         private void OnDead()
         {
             dead = true;
+            EffectManager.DeathAnim(head.position, color);
             Scoreboard.SetDead(indexScoreboard);
             head.gameObject.SetActive(false);
         }
