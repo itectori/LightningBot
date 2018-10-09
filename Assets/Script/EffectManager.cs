@@ -15,14 +15,9 @@ public class EffectManager : MonoBehaviour {
 
     private static EffectManager instance;
 
-    IEnumerator Start()
-    { 
+    void Start()
+    {
         instance = this;
-        while (true)
-        {
-            DeathAnim(new Vector3(5, 0, 5), Color.yellow);
-            yield return new WaitForSeconds(2);
-        }
     }
 
 

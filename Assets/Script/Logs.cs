@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace Script
 {
@@ -8,6 +9,23 @@ namespace Script
         TMPro.TextMeshProUGUI[] textList;
         private int listIndex;
         Queue<string> queue;
+
+        static string[] players;
+        static Color[] colors;
+        static Func<string, string>[] TABLE = {
+            SendMove,
+            Kill,
+            InvalidMove,
+            MoveTooLate
+        };
+        static string[] direction =
+        {
+            "right",
+            "down",
+            "left",
+            "up"
+        };
+
         // Use this for initialization
         void Start () {
             textList = GetComponentsInChildren<TMPro.TextMeshProUGUI>(true);
@@ -47,7 +65,48 @@ namespace Script
             listIndex = ++listIndex % 10;
             return toRet;
         }
-    
+        public void Init(string[] p, Color[]c)
+        {
+            players = p;
+            colors = c;
+        }
+        public static string Decode(string log)
+        {
+            var action = int.Parse(log.Split()[1]);
+            return TABLE[action](log);
+        }
+        private static string SendMove(string s)
+        {
+            var args = s.Split();
+            int num = int.Parse(args[2]);
+            var coloredPlayer = ColorMaker.GetColoredText(players[num], colors[num]);
+            return $"{coloredPlayer} go {direction[int.Parse(args[3])]}";
+        }
+        private static string Kill(string s)
+        {
+            var args = s.Split();
+            var a1 = int.Parse(args[2]);
+            var a2 = int.Parse(args[3]);
+            var p1 = ColorMaker.GetColoredText(players[a1], colors[a1]);
+            var p2 = ColorMaker.GetColoredText(players[a2], colors[a2]);
+            return $"{p1} killed {p2}";
+        }
+        private static string InvalidMove(string s)
+        {
+            var args = s.Split();
+            var a1 = int.Parse(args[2]);
+            var p1 = ColorMaker.GetColoredText(players[a1], colors[a1]);
+            return $"{p1} sent invalid move";
+        }
+        private static string MoveTooLate(string s)
+        {
+            var args = s.Split();
+            var a1 = int.Parse(args[2]);
+            var p1 = ColorMaker.GetColoredText(players[a1], colors[a1]);
+            return $"{p1} sent moved too late";
+        }
+
+
         IEnumerator LogsCor()
         {
             string log = null;
