@@ -31,6 +31,10 @@ namespace Script
 
         private void Update()
         {
+            if (!GameManager.Ready)
+                return;
+            
+
             var pos = Input.mousePosition;
             if (pos != mousePos)
             {
@@ -46,23 +50,21 @@ namespace Script
                 }
             }
 
-            if (GameManager.Ready)
-            {
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (lastValue != slider.value)
-                    changing = true;
-                if (!changing)
-                    slider.value += Time.deltaTime / GameManager.TotalDuration * 2 * GameManager.TimeTurn;
-                else if (Input.GetMouseButtonUp(0))
-                    changing = false;
-                foreach (var d in dependences)
-                    d.TimelineUpdate(slider.value);
-                lastValue = slider.value;
-            }
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (lastValue != slider.value)
+                changing = true;
+            if (!changing)
+                slider.value += Time.deltaTime / GameManager.TotalDuration * 2 * GameManager.TimeTurn;
+            else if (Input.GetMouseButtonUp(0))
+                changing = false;
+            foreach (var d in dependences)
+                d.TimelineUpdate(slider.value);
+            lastValue = slider.value;
         }
 
         public static void ResetTime()
         {
+            instance.slider.interactable = true;
             instance.slider.value = 0;
             instance.lastValue = 0;
         }

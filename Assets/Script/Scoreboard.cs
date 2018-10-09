@@ -13,6 +13,7 @@ namespace Script
         private void Start()
         {
             tmpro = GetComponent<TMPro.TextMeshProUGUI>();
+            tmpro.text = "";
             if (cTab != null)
                 DrawPlayers();
         }
