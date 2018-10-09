@@ -6,7 +6,7 @@
 Assets/AssetStoreTools*
 Assets/Plugins/Editor/JetBrains.meta
 Assets/Plugins/Editor/JetBrains/
-Build.zip
+*.zip
 
 # IDE cache directory
 .vs/

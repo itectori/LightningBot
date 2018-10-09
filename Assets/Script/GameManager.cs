@@ -44,7 +44,6 @@ namespace Script
         private static int nbPlayers;
         private static int sizeMap;
         public static float Unit;
-        private static string[] lines;
         private static Player[] players;
         private static int nbTours;
         private static GameManager instance;
@@ -69,7 +68,7 @@ namespace Script
 
         public static void NewGame(string game)
         {
-            Timeline.Reset();
+            Timeline.ResetTime();
             if (players != null)
                 foreach (var p in players)
                     p.Dispose();
@@ -95,12 +94,20 @@ namespace Script
 
         private void ParseGameLogs(string s)
         {
+            var lines = s.Split('\n');
+            var totalMs = int.Parse(lines[0]);
+            var pseudo = lines[1].Split(' ');
+            Logs.Init(pseudo, ColorMaker.DivideColors((uint) pseudo.Length));
+
+            for (var i = 2; i < lines.Length - 1; i++)
+                Logs.AddLog(Logs.Decode(lines[i]), float.Parse(lines[i].Split(' ')[0]) / totalMs);
+
             readyLogs = true;
         }
 
         private void ParseGameSave(string s)
         {
-            lines = s.Split('\n');
+            var lines = s.Split('\n');
             var playersName = lines[0].Split(' ').ToList();
             nbPlayers = playersName.Count;
             var colors = ColorMaker.DivideColors((uint) nbPlayers);

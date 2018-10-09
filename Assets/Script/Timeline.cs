@@ -61,7 +61,7 @@ namespace Script
             }
         }
 
-        static public void Reset()
+        public static void ResetTime()
         {
             instance.slider.value = 0;
             instance.lastValue = 0;
