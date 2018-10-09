@@ -23,8 +23,8 @@ public class RippleEffect : MonoBehaviour
 
     [Range(0.0f, 2.0f)]
     public float dropInterval = 0.5f;
-
-    Shader shader;
+    [HideInInspector]
+    public Shader shader;
 
     Camera c;
 
@@ -73,7 +73,8 @@ public class RippleEffect : MonoBehaviour
         material.SetVector("_Params2", new Vector4(1, 1 / c.aspect, refractionStrength, reflectionStrength));
     }
 
-    void Awake()
+
+    public void ManualAwake()
     {
         
         droplets = new Droplet[3];

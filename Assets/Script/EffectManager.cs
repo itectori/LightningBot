@@ -10,13 +10,22 @@ public class EffectManager : MonoBehaviour {
     [SerializeField]
     int[] numberParticles = { 1, 1, 5 };
 
+    [SerializeField]
+    Shader ripple;
+
     private static EffectManager instance;
 
-    private void Start()
+    IEnumerator Start()
     { 
         instance = this;
+        while (true)
+        {
+            DeathAnim(new Vector3(5, 0, 5), Color.yellow);
+            yield return new WaitForSeconds(2);
+        }
     }
-    
+
+
     public static void DeathAnim(Vector3 worldPos, Color col)
     {
         var effect = instance.cam.gameObject.AddComponent<RippleEffect>();
@@ -29,6 +38,8 @@ public class EffectManager : MonoBehaviour {
         }
         worldPos = instance.cam.WorldToScreenPoint(worldPos);
         effect.reflectionColor = col;
+        effect.shader = instance.ripple;
+        effect.ManualAwake();
         effect.Emit(new Vector3(worldPos.x/Screen.width, worldPos.y/Screen.height));
     }
 }
