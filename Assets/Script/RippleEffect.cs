@@ -92,7 +92,7 @@ public class RippleEffect : MonoBehaviour
             gradTexture.SetPixel(i, 0, new Color(a, a, a, a));
         }
         gradTexture.Apply();
-        material = new Material(Shader.Find("Hidden/Ripple Effect"));
+        material = new Material(shader);
         material.hideFlags = HideFlags.DontSave;
         material.SetTexture("_GradTex", gradTexture);
 

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ItemsAnimator : MonoBehaviour {
     RawImage[] children;
-    Text[] childrenText;
+    TMPro.TextMeshProUGUI[] childrenText;
     Vector3[] startPoses;
     Vector3[] endPoses;
     bool deployed = false;
@@ -19,7 +19,7 @@ public class ItemsAnimator : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         children = transform.GetComponentsInChildren<RawImage>();
-        childrenText = transform.GetComponentsInChildren<Text>();
+        childrenText = transform.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
         startPoses = new Vector3[children.Length];
         endPoses = new Vector3[children.Length];
         for (int i = 0; i < children.Length; ++i)
