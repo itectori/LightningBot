@@ -65,12 +65,15 @@ public class RippleEffect : MonoBehaviour
     public void StartChrono()
     {
         available = false;
+        this.enabled = true;
+        print("ENABLE PLEASE");
         StartCoroutine(Timer());
     }
 
     private IEnumerator Timer()
     {
         yield return new WaitForSeconds(4);
+        this.enabled = false;
         available = true;
     }
 

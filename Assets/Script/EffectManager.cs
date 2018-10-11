@@ -30,7 +30,11 @@ public class EffectManager : MonoBehaviour {
         foreach (var e in shockwaveList)
         {
             if (e.available)
+            {
+                e.StartChrono();
                 return e;
+            }
+                
         }
         var effect = instance.cam.gameObject.AddComponent<RippleEffect>();
         shockwaveList.Add(effect);
