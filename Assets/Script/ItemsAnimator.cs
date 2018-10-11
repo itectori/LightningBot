@@ -5,12 +5,13 @@ using System;
 using UnityEngine.UI;
 
 public class ItemsAnimator : MonoBehaviour {
-    RawImage[] children;
+    RawImage[] panels;
     TMPro.TextMeshProUGUI[] childrenText;
     Vector3[] startPoses;
     Vector3[] endPoses;
     bool deployed = false;
     int numberOfDeployedItem = 0;
+    int targetIndex = 0;
     [HideInInspector]
     public string[] currentGameTab = null;
     private IEnumerator deployCor;
@@ -18,13 +19,13 @@ public class ItemsAnimator : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        children = transform.GetComponentsInChildren<RawImage>();
+        panels = transform.GetComponentsInChildren<RawImage>();
         childrenText = transform.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
-        startPoses = new Vector3[children.Length];
-        endPoses = new Vector3[children.Length];
-        for (int i = 0; i < children.Length; ++i)
+        startPoses = new Vector3[panels.Length];
+        endPoses = new Vector3[panels.Length];
+        for (int i = 0; i < panels.Length; ++i)
         {
-            startPoses[i] = children[i].rectTransform.position;
+            startPoses[i] = panels[i].rectTransform.position;
             endPoses[i] = startPoses[i] + new Vector3(182, 0, 0);
         }
         
@@ -33,31 +34,24 @@ public class ItemsAnimator : MonoBehaviour {
 
     public void ShowItem(int num, float delay=0)
     {
-        StartCoroutine(Deploy(num, 0));
+        targetIndex = 14;
+        StartCoroutine(MoveRight(0));
     }
     public void FilterItem(string[] gameTab)
     {
-        int gamesToAdd = gameTab.Length - numberOfDeployedItem;
+        
         SetChildrenText(gameTab);
-        if (gamesToAdd == 0)
-            return;
-        print("GAMES TO ADD" + gamesToAdd);
-        if (gamesToAdd < 0)
-        {
-            
-            UndeployCor = UndeployRange(numberOfDeployedItem, gameTab.Length);
-            StartCoroutine(UndeployCor);
-        }
-        else
-        {
-            
-            deployCor = DeployRange(numberOfDeployedItem, gameTab.Length);
-            StartCoroutine(deployCor);
-        }
+        int newTargetIndex = gameTab.Length;
+        if (newTargetIndex > targetIndex)
+            StartCoroutine(MoveRight(0));
+        else if (newTargetIndex < targetIndex)
+            StartCoroutine(MoveLeft(0));
+        targetIndex = newTargetIndex;
     }
     public void HideAllItems()
     {
-        StartCoroutine(Undeploy());
+        targetIndex = 14;
+        StartCoroutine(MoveLeft(0));
     }
 
     public void SetChildrenText(string[] gameTab)
@@ -71,32 +65,75 @@ public class ItemsAnimator : MonoBehaviour {
         }
         currentGameTab = gameTab;
     }
-    private void checkSamePos(ref float[] indextab, RawImage[] children, int from, int to)
+    private float inverseLerpRight(int iPanel)
     {
-        for (int i =from; i < to;++i)
+        return Mathf.InverseLerp(startPoses[iPanel].x, endPoses[iPanel].x, panels[iPanel].rectTransform.position.x);
+    }
+    private float inverseLerpLeft(int iPanel)
+    {
+        return Mathf.InverseLerp(endPoses[iPanel].x, startPoses[iPanel].x, panels[iPanel].rectTransform.position.x);
+       
+    }
+
+    void callNext(int iPanel)
+    {
+        print(iPanel + "," + targetIndex);
+        if (iPanel < targetIndex)
+            StartCoroutine(MoveRight(iPanel + 1));
+        else if (iPanel > targetIndex)
+            StartCoroutine(MoveLeft(iPanel + 1));
+    }
+
+    IEnumerator MoveRight(int iPanel)
+    {
+        if (iPanel == panels.Length)
+            yield return null;
+        else
         {
-            if (children[i].rectTransform.position.x == startPoses[i].x)
-                continue;
-            else
+            float i = inverseLerpRight(iPanel);
+            bool calledNext = false;
+            while (i < 1)
             {
-                indextab[i] = Mathf.InverseLerp(startPoses[i].x, endPoses[i].x, children[i].rectTransform.position.x);
-                print("INDEX: " + i + "CHANGED TO: " + indextab[i]);
+                if (!calledNext && i > 0.25f)
+                {
+                    calledNext = true;
+                    callNext(iPanel);
+                }
+                i += Time.deltaTime * 4;
+                panels[iPanel].rectTransform.position = Vector3.Lerp(startPoses[iPanel], endPoses[iPanel], Mathf.SmoothStep(0, 1, i));
+                yield return null;
             }
+            if(!calledNext)
+                callNext(iPanel);
         }
     }
-    private void checkSameUnPos(ref float[] indextab, RawImage[] children, int from, int to)
+    IEnumerator MoveLeft(int iPanel)
     {
-        for (int i = from; i < to; ++i)
+        if (iPanel == 14)
         {
-            if (children[i].rectTransform.position.x == endPoses[i].x)
-                continue;
-            else
+            yield return null;
+        }
+        else
+        {
+            float i = inverseLerpLeft(iPanel);
+            print("Inverted" + i);
+            bool calledNext = false;
+            while (i < 1)
             {
-                indextab[i] = Mathf.InverseLerp(endPoses[i].x,startPoses[i].x, children[i].rectTransform.position.x);
-                print("INDEX: " + i + "CHANGED TO: " + indextab[i]);
+                if (!calledNext && i > 0.25f)
+                {
+                    calledNext = true;
+                    callNext(iPanel);
+                }
+                i += Time.deltaTime * 4;
+                panels[iPanel].rectTransform.position = Vector3.Lerp(endPoses[iPanel], startPoses[iPanel], Mathf.SmoothStep(0, 1, i));
+                yield return null;
             }
+            if (!calledNext)
+                callNext(iPanel);
         }
     }
+
     IEnumerator Deploy(int num, float wait)
     {
         if (num > 15)
@@ -110,94 +147,16 @@ public class ItemsAnimator : MonoBehaviour {
             for (var i = 0; i < nbItem; ++i)
             {
                 indexTab[i] += Time.deltaTime * 4;
-                children[i].rectTransform.position = Vector3.Lerp(startPoses[i], endPoses[i], Mathf.SmoothStep(0, 1, indexTab[i]));
+                panels[i].rectTransform.position = Vector3.Lerp(startPoses[i], endPoses[i], Mathf.SmoothStep(0, 1, indexTab[i]));
             }
             if (indexTab[nbItem - 1] > 0.15f && nbItem < num)
                 nbItem += 1;
             yield return null;
         }
         for (var i = 0; i < nbItem; ++i)
-            children[i].rectTransform.position = Vector3.Lerp(startPoses[i], endPoses[i], 1);
+            panels[i].rectTransform.position = Vector3.Lerp(startPoses[i], endPoses[i], 1);
         deployed = true;
     }
 
-    bool evertythingAtOne(int from, float[]tab)
-    {
-        for(;from < tab.Length;++from )
-            if (tab[from] < 1)
-            {
-                print(from);
-                return false;
-            }
-        return true;
-    }
-    IEnumerator DeployRange(int from, int to)
-    {
-
-        numberOfDeployedItem = to;
-        float[] indexTab = new float[to];
-        int nbItem = from+1;
-        checkSamePos(ref indexTab, children, from, to);
-
-        while (!evertythingAtOne(from,indexTab))
-        {
-            for (var i = from ; i < nbItem ; ++i)
-            {
-                indexTab[i] += Time.deltaTime * 1;
-                children[i].rectTransform.position = Vector3.Lerp(startPoses[i], endPoses[i], Mathf.SmoothStep(0, 1, indexTab[i]));
-            }
-            if (indexTab[nbItem -1] > 0.05f && nbItem <to )
-                nbItem += 1;
-            yield return null;
-        }
-        print("FINISHED DEPLOY");
-    }
-        
-    IEnumerator Undeploy(float wait = 0)
-    {
-
-        yield return new WaitForSeconds(wait);
-        float[] indexTab = new float[numberOfDeployedItem];
-        numberOfDeployedItem = 0;
-        int nbItem = 1;
-        while (indexTab[indexTab.Length - 1] < 1)
-        {
-            for (var i = 0; i < nbItem; ++i)
-            {
-               
-                indexTab[i] += Time.deltaTime * 4;
-                if (children[i].rectTransform.position == startPoses[i])
-                    continue;
-                children[i].rectTransform.position = Vector3.Lerp(endPoses[i], startPoses[i], Mathf.SmoothStep(0, 1, indexTab[i]));
-            }
-            if (indexTab[nbItem - 1] > 0.15f && nbItem < indexTab.Length)
-                nbItem += 1;
-            yield return null;
-        }
-        deployed = false;
-    }
-    IEnumerator UndeployRange(int from, int to)
-    {
-        float[] indexTab = new float[numberOfDeployedItem];
-        int nbItem = to + 1;
-        numberOfDeployedItem = to;
-        checkSameUnPos(ref indexTab, children, to, from);
-        while (!evertythingAtOne(to, indexTab))
-        {
-            for (var i = to; i < nbItem ; ++i)
-            {
-                indexTab[i] += Time.deltaTime * 1;
-                if (children[i].rectTransform.position == startPoses[i])
-                    continue;
-                children[i].rectTransform.position = Vector3.Lerp(endPoses[i], startPoses[i], Mathf.SmoothStep(0, 1, indexTab[i]));
-            }
-            if (indexTab[nbItem -1] > 0.05f && nbItem < from)
-                nbItem += 1;
-            yield return null;
-        }
-        for (var i = to; i < nbItem; ++i)
-            children[i].rectTransform.position = Vector3.Lerp(endPoses[i], startPoses[i], 1);
-        deployed = false;
-        print("FINISHED");
-    }
+   
 }
