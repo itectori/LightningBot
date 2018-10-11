@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using UnityEngine.UI;
 
 public class ItemsAnimator : MonoBehaviour {
@@ -11,13 +12,12 @@ public class ItemsAnimator : MonoBehaviour {
     bool deployed = false;
     int numberOfDeployedItem = 0;
     [HideInInspector]
-    public string[] changeWhenPossible = null;
-    [HideInInspector]
     public string[] currentGameTab = null;
+    private IEnumerator deployCor;
+    private IEnumerator UndeployCor;
 
-
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         children = transform.GetComponentsInChildren<RawImage>();
         childrenText = transform.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
         startPoses = new Vector3[children.Length];
@@ -30,14 +30,30 @@ public class ItemsAnimator : MonoBehaviour {
         
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     public void ShowItem(int num, float delay=0)
     {
         StartCoroutine(Deploy(num, 0));
+    }
+    public void FilterItem(string[] gameTab)
+    {
+        int gamesToAdd = gameTab.Length - numberOfDeployedItem;
+        SetChildrenText(gameTab);
+        if (gamesToAdd == 0)
+            return;
+        print("GAMES TO ADD" + gamesToAdd);
+        if (gamesToAdd < 0)
+        {
+            
+            UndeployCor = UndeployRange(numberOfDeployedItem, gameTab.Length);
+            StartCoroutine(UndeployCor);
+        }
+        else
+        {
+            
+            deployCor = DeployRange(numberOfDeployedItem, gameTab.Length);
+            StartCoroutine(deployCor);
+        }
     }
     public void HideAllItems()
     {
@@ -46,30 +62,49 @@ public class ItemsAnimator : MonoBehaviour {
 
     public void SetChildrenText(string[] gameTab)
     {
-        if (deployed)
-            changeWhenPossible = gameTab;
-        else
+        for (int i = 0; i < 15; ++i)
         {
-            for (int i = 0; i < gameTab.Length && i < 15; ++i)
+            if (i >= gameTab.Length)
+                childrenText[i].text = "";
+            else
                 childrenText[i].text = gameTab[i];
-            currentGameTab = gameTab;
+        }
+        currentGameTab = gameTab;
+    }
+    private void checkSamePos(ref float[] indextab, RawImage[] children, int from, int to)
+    {
+        for (int i =from; i < to;++i)
+        {
+            if (children[i].rectTransform.position.x == startPoses[i].x)
+                continue;
+            else
+            {
+                indextab[i] = Mathf.InverseLerp(startPoses[i].x, endPoses[i].x, children[i].rectTransform.position.x);
+                print("INDEX: " + i + "CHANGED TO: " + indextab[i]);
+            }
         }
     }
-    
+    private void checkSameUnPos(ref float[] indextab, RawImage[] children, int from, int to)
+    {
+        for (int i = from; i < to; ++i)
+        {
+            if (children[i].rectTransform.position.x == endPoses[i].x)
+                continue;
+            else
+            {
+                indextab[i] = Mathf.InverseLerp(endPoses[i].x,startPoses[i].x, children[i].rectTransform.position.x);
+                print("INDEX: " + i + "CHANGED TO: " + indextab[i]);
+            }
+        }
+    }
     IEnumerator Deploy(int num, float wait)
     {
-        while (deployed) yield return null;
-        if (changeWhenPossible.Length != 0)
-        {
-            SetChildrenText(changeWhenPossible);
-        }
         if (num > 15)
             num = 15;
         numberOfDeployedItem = num;
         yield return new WaitForSeconds(wait);
         float[] indexTab = new float[num];
         int nbItem = 1;
-        
         while (indexTab[indexTab.Length-1] < 1)
         {
             for (var i = 0; i < nbItem; ++i)
@@ -81,13 +116,49 @@ public class ItemsAnimator : MonoBehaviour {
                 nbItem += 1;
             yield return null;
         }
+        for (var i = 0; i < nbItem; ++i)
+            children[i].rectTransform.position = Vector3.Lerp(startPoses[i], endPoses[i], 1);
         deployed = true;
     }
+
+    bool evertythingAtOne(int from, float[]tab)
+    {
+        for(;from < tab.Length;++from )
+            if (tab[from] < 1)
+            {
+                print(from);
+                return false;
+            }
+        return true;
+    }
+    IEnumerator DeployRange(int from, int to)
+    {
+
+        numberOfDeployedItem = to;
+        float[] indexTab = new float[to];
+        int nbItem = from+1;
+        checkSamePos(ref indexTab, children, from, to);
+
+        while (!evertythingAtOne(from,indexTab))
+        {
+            for (var i = from ; i < nbItem ; ++i)
+            {
+                indexTab[i] += Time.deltaTime * 1;
+                children[i].rectTransform.position = Vector3.Lerp(startPoses[i], endPoses[i], Mathf.SmoothStep(0, 1, indexTab[i]));
+            }
+            if (indexTab[nbItem -1] > 0.05f && nbItem <to )
+                nbItem += 1;
+            yield return null;
+        }
+        print("FINISHED DEPLOY");
+    }
+        
     IEnumerator Undeploy(float wait = 0)
     {
 
         yield return new WaitForSeconds(wait);
         float[] indexTab = new float[numberOfDeployedItem];
+        numberOfDeployedItem = 0;
         int nbItem = 1;
         while (indexTab[indexTab.Length - 1] < 1)
         {
@@ -104,5 +175,29 @@ public class ItemsAnimator : MonoBehaviour {
             yield return null;
         }
         deployed = false;
+    }
+    IEnumerator UndeployRange(int from, int to)
+    {
+        float[] indexTab = new float[numberOfDeployedItem];
+        int nbItem = to + 1;
+        numberOfDeployedItem = to;
+        checkSameUnPos(ref indexTab, children, to, from);
+        while (!evertythingAtOne(to, indexTab))
+        {
+            for (var i = to; i < nbItem ; ++i)
+            {
+                indexTab[i] += Time.deltaTime * 1;
+                if (children[i].rectTransform.position == startPoses[i])
+                    continue;
+                children[i].rectTransform.position = Vector3.Lerp(endPoses[i], startPoses[i], Mathf.SmoothStep(0, 1, indexTab[i]));
+            }
+            if (indexTab[nbItem -1] > 0.05f && nbItem < from)
+                nbItem += 1;
+            yield return null;
+        }
+        for (var i = to; i < nbItem; ++i)
+            children[i].rectTransform.position = Vector3.Lerp(endPoses[i], startPoses[i], 1);
+        deployed = false;
+        print("FINISHED");
     }
 }

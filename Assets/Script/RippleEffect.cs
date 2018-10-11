@@ -25,7 +25,8 @@ public class RippleEffect : MonoBehaviour
     public float dropInterval = 0.5f;
     [HideInInspector]
     public Shader shader;
-
+    [HideInInspector]
+    public bool available;
     Camera c;
 
     class Droplet
@@ -61,9 +62,21 @@ public class RippleEffect : MonoBehaviour
     float timer;
     int dropCount;
 
-    void UpdateShaderParameters()
+    public void StartChrono()
     {
-        var c = GetComponent<Camera>();
+        available = false;
+        StartCoroutine(Timer());
+    }
+
+    private IEnumerator Timer()
+    {
+        yield return new WaitForSeconds(4);
+        available = true;
+    }
+
+    public void UpdateShaderParameters()
+    {
+        var c = Camera.main;
         material.SetVector("_Drop1", droplets[0].MakeShaderParameter(c.aspect));
         material.SetVector("_Drop2", droplets[1].MakeShaderParameter(c.aspect));
         material.SetVector("_Drop3", droplets[2].MakeShaderParameter(c.aspect));
@@ -76,7 +89,7 @@ public class RippleEffect : MonoBehaviour
 
     public void ManualAwake()
     {
-        
+        available = false;
         droplets = new Droplet[3];
         droplets[0] = new Droplet();
         droplets[1] = new Droplet();

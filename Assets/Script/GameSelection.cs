@@ -61,22 +61,17 @@ public class GameSelection : MonoBehaviour {
     {
         if (!deployedSearch)
             return;
-        string[] filteredTab = currentGames.Where(g => g.StartsWith(token)).ToArray();
+        string[] filteredTab = currentGames.Where(g => g.ToLower().Contains(token.ToLower())).Take(15).ToArray();
         //string[] filteredTab = new string[] { "lol", "mdr" };
+        itemAnim.FilterItem(filteredTab);
+    }
+    public void OnEnterGame(string token)
+    {
+        string[] filteredTab = currentGames.Where(g => g.StartsWith(token)).ToArray();
         if (filteredTab.Length == 1)
         {
             LoadGame(filteredTab[0]);
             return;
-        }
-        else if (filteredTab.Length == 0)
-        {
-            itemAnim.HideAllItems();
-        }
-        else
-        {
-            itemAnim.HideAllItems();
-            itemAnim.SetChildrenText(filteredTab);
-            itemAnim.ShowItem(filteredTab.Length);
         }
     }
 
