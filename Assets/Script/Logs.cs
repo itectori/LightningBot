@@ -97,6 +97,8 @@ namespace Script
         {
             while (lastLog < logTimeline.Count && logTimeline[lastLog] <= t)
                 lastLog++;
+            if (lastLog > logTimeline.Count)
+                lastLog = logTimeline.Count;
             while (lastLog - 1 > 0 && logTimeline[lastLog - 1] > t)
                 lastLog--;
 
