@@ -174,7 +174,7 @@ namespace Script
 
         public static int GridToImage(float pos)
         {
-            return (int) (pos * Unit);
+            return (int) (pos * Unit) - Trail.WIDTH / 2 - (int)(Unit / 2);
         }
 
 
@@ -191,7 +191,7 @@ namespace Script
 
         public static float GridToWorld(float pos)
         {
-            return ((pos / sizeMap + (float) Trail.WIDTH / WIDTH / 2f) * scaleMap % scaleMap + scaleMap) % scaleMap;
+            return ((pos / sizeMap - Unit / WIDTH / 2f) * scaleMap % scaleMap + scaleMap) % scaleMap;
         }
     }
 }
