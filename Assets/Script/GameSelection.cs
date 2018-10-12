@@ -62,6 +62,7 @@ public class GameSelection : MonoBehaviour {
         if (!deployedSearch)
             return;
         string[] filteredTab = currentGames.Where(g => g.ToLower().Contains(token.ToLower())).Take(15).ToArray();
+        print(filteredTab.Length);
         //string[] filteredTab = new string[] { "lol", "mdr" };
         itemAnim.FilterItem(filteredTab);
     }
