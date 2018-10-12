@@ -60,7 +60,7 @@ public class ItemsAnimator : MonoBehaviour {
      }
     public void HideAllItems()
     {
-        targetIndex = 0;
+        targetIndex = -1;
         StartCoroutine(MoveLeft(14));
     }
 
@@ -71,7 +71,18 @@ public class ItemsAnimator : MonoBehaviour {
             if (i >= gameTab.Length)
                 childrenText[i].text = "";
             else
+            {
+                var newName = gameTab[i];
+                if (gameTab[i][0] == '%')
+                {
+                    newName = gameTab[i].Remove(0, 1);
+                    panels[i].color = Color.red;
+                }
+                else
+                    panels[i].color = Color.white;
+
                 childrenText[i].text = gameTab[i];
+            }
         }
         currentGameTab = gameTab;
     }

@@ -66,7 +66,6 @@ public class RippleEffect : MonoBehaviour
     {
         available = false;
         this.enabled = true;
-        print("ENABLE PLEASE");
         StartCoroutine(Timer());
     }
 
