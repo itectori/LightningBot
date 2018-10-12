@@ -41,17 +41,27 @@ public class ItemsAnimator : MonoBehaviour {
     {
         
         SetChildrenText(gameTab);
-        int newTargetIndex = gameTab.Length;
+
+        int newTargetIndex = gameTab.Length-1;
+
         if (newTargetIndex > targetIndex)
+        {
+            StopAllCoroutines();
+            targetIndex = newTargetIndex;
             StartCoroutine(MoveRight(0));
+
+        }
         else if (newTargetIndex < targetIndex)
-            StartCoroutine(MoveLeft(0));
-        targetIndex = newTargetIndex;
-    }
+        {
+            StopAllCoroutines();
+            targetIndex = newTargetIndex;
+            StartCoroutine(MoveLeft(14));
+        }
+     }
     public void HideAllItems()
     {
-        targetIndex = 14;
-        StartCoroutine(MoveLeft(0));
+        targetIndex = 0;
+        StartCoroutine(MoveLeft(14));
     }
 
     public void SetChildrenText(string[] gameTab)
@@ -86,7 +96,7 @@ public class ItemsAnimator : MonoBehaviour {
 
     IEnumerator MoveRight(int iPanel)
     {
-        if (iPanel == panels.Length)
+        if (iPanel > targetIndex)
             yield return null;
         else
         {
@@ -94,43 +104,48 @@ public class ItemsAnimator : MonoBehaviour {
             bool calledNext = false;
             while (i < 1)
             {
-                if (!calledNext && i > 0.25f)
+                if (!calledNext && i > 0.15f)
                 {
                     calledNext = true;
-                    callNext(iPanel);
+                    if (iPanel < targetIndex)
+                        StartCoroutine(MoveRight(iPanel + 1));
                 }
-                i += Time.deltaTime * 4;
+                i += Time.deltaTime * 5;
                 panels[iPanel].rectTransform.position = Vector3.Lerp(startPoses[iPanel], endPoses[iPanel], Mathf.SmoothStep(0, 1, i));
                 yield return null;
             }
             if(!calledNext)
-                callNext(iPanel);
+                if (iPanel < targetIndex)
+                    StartCoroutine(MoveRight(iPanel + 1));
         }
     }
     IEnumerator MoveLeft(int iPanel)
     {
-        if (iPanel == 14)
+        if (iPanel <= targetIndex)
         {
             yield return null;
         }
         else
         {
             float i = inverseLerpLeft(iPanel);
-            print("Inverted" + i);
             bool calledNext = false;
             while (i < 1)
             {
-                if (!calledNext && i > 0.25f)
+                if (!calledNext && i > 0.15f)
                 {
                     calledNext = true;
-                    callNext(iPanel);
+                    if (iPanel > targetIndex)
+                        StartCoroutine(MoveLeft(iPanel - 1));
                 }
-                i += Time.deltaTime * 4;
+                i += Time.deltaTime * 5;
                 panels[iPanel].rectTransform.position = Vector3.Lerp(endPoses[iPanel], startPoses[iPanel], Mathf.SmoothStep(0, 1, i));
                 yield return null;
             }
             if (!calledNext)
-                callNext(iPanel);
+            {
+                if (iPanel > targetIndex)
+                    StartCoroutine(MoveLeft(iPanel - 1));
+            }
         }
     }
 
