@@ -9,9 +9,8 @@ public class ItemsAnimator : MonoBehaviour {
     TMPro.TextMeshProUGUI[] childrenText;
     Vector3[] startPoses;
     Vector3[] endPoses;
-    bool deployed = false;
-    int numberOfDeployedItem = 0;
     int targetIndex = 0;
+    char rankedMode = '_';
     [HideInInspector]
     public string[] currentGameTab = null;
     private IEnumerator deployCor;
@@ -34,7 +33,7 @@ public class ItemsAnimator : MonoBehaviour {
 
     public void ShowItem(int num, float delay=0)
     {
-        targetIndex = 14;
+        targetIndex = num - 1 < 14 ? num - 1 : 14;
         StartCoroutine(MoveRight(0));
     }
     public void FilterItem(string[] gameTab)
@@ -73,15 +72,15 @@ public class ItemsAnimator : MonoBehaviour {
             else
             {
                 var newName = gameTab[i];
-                if (gameTab[i][0] == '%')
+                if (gameTab[i][0] == rankedMode)
                 {
                     newName = gameTab[i].Remove(0, 1);
-                    panels[i].color = Color.red;
+                    panels[i].color = Color.white;
                 }
                 else
-                    panels[i].color = Color.white;
+                    panels[i].color = Color.green;
 
-                childrenText[i].text = gameTab[i];
+                childrenText[i].text = newName;
             }
         }
         currentGameTab = gameTab;
@@ -94,15 +93,6 @@ public class ItemsAnimator : MonoBehaviour {
     {
         return Mathf.InverseLerp(endPoses[iPanel].x, startPoses[iPanel].x, panels[iPanel].rectTransform.position.x);
        
-    }
-
-    void callNext(int iPanel)
-    {
-        print(iPanel + "," + targetIndex);
-        if (iPanel < targetIndex)
-            StartCoroutine(MoveRight(iPanel + 1));
-        else if (iPanel > targetIndex)
-            StartCoroutine(MoveLeft(iPanel + 1));
     }
 
     IEnumerator MoveRight(int iPanel)
@@ -158,30 +148,6 @@ public class ItemsAnimator : MonoBehaviour {
                     StartCoroutine(MoveLeft(iPanel - 1));
             }
         }
-    }
-
-    IEnumerator Deploy(int num, float wait)
-    {
-        if (num > 15)
-            num = 15;
-        numberOfDeployedItem = num;
-        yield return new WaitForSeconds(wait);
-        float[] indexTab = new float[num];
-        int nbItem = 1;
-        while (indexTab[indexTab.Length-1] < 1)
-        {
-            for (var i = 0; i < nbItem; ++i)
-            {
-                indexTab[i] += Time.deltaTime * 4;
-                panels[i].rectTransform.position = Vector3.Lerp(startPoses[i], endPoses[i], Mathf.SmoothStep(0, 1, indexTab[i]));
-            }
-            if (indexTab[nbItem - 1] > 0.15f && nbItem < num)
-                nbItem += 1;
-            yield return null;
-        }
-        for (var i = 0; i < nbItem; ++i)
-            panels[i].rectTransform.position = Vector3.Lerp(startPoses[i], endPoses[i], 1);
-        deployed = true;
     }
 
    
