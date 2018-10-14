@@ -34,7 +34,7 @@ public class ItemsAnimator : MonoBehaviour {
 
     public void ShowItem(int num, float delay=0)
     {
-        targetIndex = 14;
+        targetIndex = num -1;
         StartCoroutine(MoveRight(0));
     }
     public void FilterItem(string[] gameTab)
@@ -73,15 +73,14 @@ public class ItemsAnimator : MonoBehaviour {
             else
             {
                 var newName = gameTab[i];
-                if (gameTab[i][0] == '%')
+                if (gameTab[i][0] == '_')
                 {
-                    newName = gameTab[i].Remove(0, 1);
-                    panels[i].color = Color.red;
+                    childrenText[i].text = gameTab[i].Substring(1);
                 }
                 else
-                    panels[i].color = Color.white;
-
-                childrenText[i].text = gameTab[i];
+                {
+                    childrenText[i].text = gameTab[i];
+                }
             }
         }
         currentGameTab = gameTab;
