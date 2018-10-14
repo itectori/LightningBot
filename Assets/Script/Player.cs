@@ -17,8 +17,6 @@ namespace Script
     public class Player : ITimelineDepend, IDisposable
     {
         private readonly Color color;
-        private readonly int startX;
-        private readonly int startY;
         private readonly Transform head;
         private readonly List<Trail> trail = new List<Trail>();
         private readonly int indexScoreboard;
@@ -28,8 +26,6 @@ namespace Script
         public Player(Color color, int startX, int startY, GameObject head, int indexScoreboard)
         {
             this.color = color;
-            this.startX = startX;
-            this.startY = startY;
             this.indexScoreboard = indexScoreboard;
             this.head = head.transform;
             xInstantiate = startX;
