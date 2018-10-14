@@ -9,7 +9,7 @@ namespace Script
         private TMPro.TextMeshProUGUI container;
         private int firstLog;
         private int lastLog;
-        private const int NB_LOGS = 15;
+        private const int NB_LOGS = 30;
 
 
         private static List<float> logTimeline;
