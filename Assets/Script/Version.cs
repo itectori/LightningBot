@@ -1,22 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Script;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class Version : MonoBehaviour
+namespace Script
 {
-	private Text version;
-	
-	void Start ()
+	public class Version : MonoBehaviour
 	{
-		print("start");
-		version = GetComponent<Text>();
-		StartCoroutine(Tools.WebRequest("lightningbot.tk/version", DisplayVersion));
-	}
+		private Text version;
 
-	private void DisplayVersion(string s)
-	{
-		version.text = "< " + s + " >";
+		private void Start ()
+		{
+			version = GetComponent<Text>();
+			StartCoroutine(Tools.WebRequest("lightningbot.tk/version", DisplayVersion));
+		}
+
+		private void DisplayVersion(string s)
+		{
+			version.text = "< " + s + " >";
+		}
 	}
 }
