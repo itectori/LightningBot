@@ -44,21 +44,10 @@ public class ItemsAnimator : MonoBehaviour {
 
         int newTargetIndex = gameTab.Length-1;
 
-        if (newTargetIndex > targetIndex)
-        {
-            StopAllCoroutines();
-            targetIndex = newTargetIndex;
-            StartCoroutine(MoveRight(0));
-            StartCoroutine(MoveLeft(14));
-
-        }
-        else if (newTargetIndex < targetIndex)
-        {
             StopAllCoroutines();
             targetIndex = newTargetIndex;
             StartCoroutine(MoveLeft(14));
             StartCoroutine(MoveRight(0));
-        }
      }
     public void HideAllItems()
     {

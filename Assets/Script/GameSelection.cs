@@ -21,7 +21,7 @@ public class GameSelection : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         startpos = selector.rectTransform.position;
-        endpos = startpos +  new Vector3(182, 0, 0);
+        endpos = startpos +  new Vector3(196.5f, 0, 0);
 	    OnClickSearcher();
 	}
 	
