@@ -53,16 +53,16 @@ public class GameSelection : MonoBehaviour {
     private void SetGamesAndDisplay(string s)
     {
         var tabs = s.Split('\n');
-        currentGames = tabs;
-        itemAnim.SetChildrenText(tabs);
-        itemAnim.ShowItem(tabs.Length);
+        currentGames = tabs.Take(15).ToArray();
+        itemAnim.SetChildrenText(currentGames);
+        itemAnim.ShowItem(currentGames.Length);
     }
     public void FilterGames(string token)
     {
         if (!deployedSearch)
             return;
         string[] filteredTab = currentGames.Where(g => g.ToLower().Contains(token.ToLower())).Take(15).ToArray();
-        print(filteredTab.Length);
+
         //string[] filteredTab = new string[] { "lol", "mdr" };
         itemAnim.FilterItem(filteredTab);
     }

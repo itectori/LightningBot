@@ -49,6 +49,7 @@ public class ItemsAnimator : MonoBehaviour {
             StopAllCoroutines();
             targetIndex = newTargetIndex;
             StartCoroutine(MoveRight(0));
+            StartCoroutine(MoveLeft(14));
 
         }
         else if (newTargetIndex < targetIndex)
@@ -56,6 +57,7 @@ public class ItemsAnimator : MonoBehaviour {
             StopAllCoroutines();
             targetIndex = newTargetIndex;
             StartCoroutine(MoveLeft(14));
+            StartCoroutine(MoveRight(0));
         }
      }
     public void HideAllItems()
@@ -66,6 +68,7 @@ public class ItemsAnimator : MonoBehaviour {
 
     public void SetChildrenText(string[] gameTab)
     {
+        print("START");
         for (int i = 0; i < 15; ++i)
         {
             if (i >= gameTab.Length)
@@ -111,6 +114,7 @@ public class ItemsAnimator : MonoBehaviour {
         else
         {
             float i = inverseLerpRight(iPanel);
+            print("I: " +i);
             bool calledNext = false;
             while (i < 1)
             {
@@ -120,6 +124,7 @@ public class ItemsAnimator : MonoBehaviour {
                     if (iPanel < targetIndex)
                         StartCoroutine(MoveRight(iPanel + 1));
                 }
+                
                 i += Time.deltaTime * 5;
                 panels[iPanel].rectTransform.position = Vector3.Lerp(startPoses[iPanel], endPoses[iPanel], Mathf.SmoothStep(0, 1, i));
                 yield return null;
@@ -128,6 +133,7 @@ public class ItemsAnimator : MonoBehaviour {
                 if (iPanel < targetIndex)
                     StartCoroutine(MoveRight(iPanel + 1));
         }
+        
     }
     IEnumerator MoveLeft(int iPanel)
     {
@@ -157,6 +163,7 @@ public class ItemsAnimator : MonoBehaviour {
                     StartCoroutine(MoveLeft(iPanel - 1));
             }
         }
+       
     }
 
     IEnumerator Deploy(int num, float wait)
