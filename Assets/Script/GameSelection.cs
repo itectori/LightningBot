@@ -93,7 +93,7 @@ public class GameSelection : MonoBehaviour {
         float i = 0;
         while(i < 1)
         {
-            i += Time.deltaTime * 3;
+            i += Time.deltaTime * 5;
 
             selector.rectTransform.position = Vector3.Lerp(startpos, endpos, Mathf.SmoothStep(0.0f, 1.0f, i));
             yield return null;
@@ -107,7 +107,7 @@ public class GameSelection : MonoBehaviour {
         float i = 0;
         while (i < 1)
         {
-            i += Time.deltaTime * 3;
+            i += Time.deltaTime * 5;
 
             selector.rectTransform.position = Vector3.Lerp(endpos, startpos, Mathf.SmoothStep(0.0f, 1.0f, i));
             yield return null;
