@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -92,6 +93,12 @@ namespace Script
 
         public void TimelineUpdate(float t)
         {
+            if (trail.Count == 0)
+            {
+                
+                return;
+            }
+            
             var prevIndex = (int) (previousTime * trail.Count);
             var index = (int) (t * trail.Count);
             prevIndex = prevIndex == trail.Count ? prevIndex - 1 : prevIndex;
@@ -107,7 +114,11 @@ namespace Script
 
             previousTime = t;
             if (!dead)
-                head.localPosition = trail[lastNotNull].GetPos();
+            {
+                    head.localPosition = trail[lastNotNull]?.GetPos() ??
+                                         new Vector3(GameManager.GridToWorld(xInstantiate), 0 , GameManager.GridToWorld(yInstantiate));
+            }
+
             if (trail[index] != null || indestructible)
             {
                 if (dead)
