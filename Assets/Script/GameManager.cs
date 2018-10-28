@@ -70,6 +70,7 @@ namespace Script
         {
             Timeline.ResetTime();
             GameName.SetGameName(game);
+            HelpMessage.DeleteMessage();
             if (players != null)
                 foreach (var p in players)
                     p.Dispose();
