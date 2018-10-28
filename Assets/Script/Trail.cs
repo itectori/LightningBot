@@ -37,7 +37,7 @@ namespace Script
         }
 
         private float lastLenght;
-        public void TimelineUpdate(float t)
+        public void TimelineUpdate(float t, bool manual)
         {
             if (t >= endF)
             {

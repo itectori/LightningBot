@@ -159,13 +159,13 @@ namespace Script
             readySave = true;
         }
 
-        public override void TimelineUpdate(float t)
+        public override void TimelineUpdate(float t, bool manual)
         {
             if (!readySave)
                 return;
             foreach (var p in players)
             {
-                p.TimelineUpdate(t);
+                p.TimelineUpdate(t, manual);
             }
 
             texture.Apply();

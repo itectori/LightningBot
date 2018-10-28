@@ -8,7 +8,7 @@ namespace Script
         [SerializeField] private TMPro.TextMeshProUGUI minutes;
         [SerializeField] private TMPro.TextMeshProUGUI seconds;
 
-        public override void TimelineUpdate(float t)
+        public override void TimelineUpdate(float t, bool manual)
         {
             if (GameManager.Ready)
                 UpdateTime(t * GameManager.TotalDuration);

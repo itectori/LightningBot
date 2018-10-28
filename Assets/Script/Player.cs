@@ -91,14 +91,8 @@ namespace Script
 
         private int lastNotNull;
 
-        public void TimelineUpdate(float t)
+        public void TimelineUpdate(float t, bool manual)
         {
-            if (trail.Count == 0)
-            {
-                
-                return;
-            }
-            
             var prevIndex = (int) (previousTime * trail.Count);
             var index = (int) (t * trail.Count);
             prevIndex = prevIndex == trail.Count ? prevIndex - 1 : prevIndex;
@@ -109,14 +103,15 @@ namespace Script
                 if (trail[i] != null)
                 {
                     lastNotNull = i;
-                    trail[i].TimelineUpdate(t);
+                    trail[i].TimelineUpdate(t, manual);
                 }
 
             previousTime = t;
             if (!dead)
             {
-                    head.localPosition = trail[lastNotNull]?.GetPos() ??
-                                         new Vector3(GameManager.GridToWorld(xInstantiate), 0 , GameManager.GridToWorld(yInstantiate));
+                head.localPosition = trail[lastNotNull]?.GetPos() ??
+                                     new Vector3(GameManager.GridToWorld(xInstantiate), 0,
+                                         GameManager.GridToWorld(yInstantiate));
             }
 
             if (trail[index] != null || indestructible)
@@ -127,7 +122,7 @@ namespace Script
             else
             {
                 if (!dead)
-                    OnDead();
+                    OnDead(!manual);
             }
         }
 
@@ -138,10 +133,11 @@ namespace Script
             head.gameObject.SetActive(true);
         }
 
-        private void OnDead()
+        private void OnDead(bool playAnim)
         {
             dead = true;
-            EffectManager.DeathAnim(head.position, color);
+            if (playAnim)
+                EffectManager.DeathAnim(head.position, color);
             Scoreboard.SetDead(indexScoreboard);
             head.gameObject.SetActive(false);
         }

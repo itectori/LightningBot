@@ -59,7 +59,7 @@ namespace Script
             else if (Input.GetMouseButtonUp(0))
                 changing = false;
             foreach (var d in dependences)
-                d.TimelineUpdate(slider.value);
+                d.TimelineUpdate(slider.value, changing);
             lastValue = slider.value;
         }
 

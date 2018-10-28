@@ -93,7 +93,7 @@ namespace Script
             return $"{p1} sends move too late";
         }
 
-        public override void TimelineUpdate(float t)
+        public override void TimelineUpdate(float t, bool manual)
         {
             while (lastLog < logTimeline.Count && logTimeline[lastLog] <= t)
                 lastLog++;
