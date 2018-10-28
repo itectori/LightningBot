@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -54,7 +55,7 @@ namespace Script
             if (lastValue != slider.value)
                 changing = true;
             if (!changing)
-                slider.value += Time.deltaTime / GameManager.TotalDuration * 2 * GameManager.TimeTurn;
+                slider.value += Time.deltaTime / Math.Min(GameManager.TotalDuration / 7000f, 15f);
             else if (Input.GetMouseButtonUp(0))
                 changing = false;
             foreach (var d in dependences)
