@@ -34,6 +34,7 @@ public class ItemsAnimator : MonoBehaviour {
 
     public void ShowItem(int num, float delay=0)
     {
+        StopAllCoroutines();
         targetIndex = num -1;
         StartCoroutine(MoveRight(0));
     }
@@ -41,23 +42,21 @@ public class ItemsAnimator : MonoBehaviour {
     {
         
         SetChildrenText(gameTab);
-
         int newTargetIndex = gameTab.Length-1;
-
-            StopAllCoroutines();
-            targetIndex = newTargetIndex;
-            StartCoroutine(MoveLeft(14));
-            StartCoroutine(MoveRight(0));
+        StopAllCoroutines();
+        targetIndex = newTargetIndex;
+        StartCoroutine(MoveLeft(14));
+        StartCoroutine(MoveRight(0));
      }
     public void HideAllItems()
     {
+        StopAllCoroutines();
         targetIndex = -1;
         StartCoroutine(MoveLeft(14));
     }
 
     public void SetChildrenText(string[] gameTab)
     {
-        print("START");
         for (int i = 0; i < 15; ++i)
         {
             if (i >= gameTab.Length)
@@ -103,7 +102,6 @@ public class ItemsAnimator : MonoBehaviour {
         else
         {
             float i = inverseLerpRight(iPanel);
-            print("I: " +i);
             bool calledNext = false;
             while (i < 1)
             {
@@ -157,8 +155,8 @@ public class ItemsAnimator : MonoBehaviour {
 
     IEnumerator Deploy(int num, float wait)
     {
-        if (num > 15)
-            num = 15;
+        if (num > 14)
+            num = 14;
         numberOfDeployedItem = num;
         yield return new WaitForSeconds(wait);
         float[] indexTab = new float[num];

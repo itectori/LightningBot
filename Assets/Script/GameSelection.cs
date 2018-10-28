@@ -53,9 +53,10 @@ public class GameSelection : MonoBehaviour {
     private void SetGamesAndDisplay(string s)
     {
         var tabs = s.Split('\n');
-        currentGames = tabs.Take(15).ToArray();
-        itemAnim.SetChildrenText(currentGames);
-        itemAnim.ShowItem(currentGames.Length);
+        currentGames = tabs;
+        var tmp = currentGames.Take(15).ToArray();
+        itemAnim.SetChildrenText(tmp);
+        itemAnim.ShowItem(tmp.Length);
     }
     public void FilterGames(string token)
     {
