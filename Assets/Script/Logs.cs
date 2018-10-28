@@ -64,7 +64,7 @@ namespace Script
             var args = s.Split();
             int num = int.Parse(args[2]);
             var coloredPlayer = ColorMaker.GetColoredText(players[num], colors[num]);
-            return $"{coloredPlayer} go {direction[int.Parse(args[3])]}";
+            return $"{coloredPlayer} goes {direction[int.Parse(args[3])]}";
         }
 
         private static string Kill(string s)
@@ -82,7 +82,7 @@ namespace Script
             var args = s.Split();
             var a1 = int.Parse(args[2]);
             var p1 = ColorMaker.GetColoredText(players[a1], colors[a1]);
-            return $"{p1} sent invalid move";
+            return $"{p1} sends invalid move";
         }
 
         private static string MoveTooLate(string s)
@@ -90,7 +90,7 @@ namespace Script
             var args = s.Split();
             var a1 = int.Parse(args[2]);
             var p1 = ColorMaker.GetColoredText(players[a1], colors[a1]);
-            return $"{p1} sent moved too late";
+            return $"{p1} sends move too late";
         }
 
         public override void TimelineUpdate(float t)
