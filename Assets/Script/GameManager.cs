@@ -69,13 +69,14 @@ namespace Script
         public static void NewGame(string game)
         {
             Timeline.ResetTime();
+            GameName.SetGameName(game);
             if (players != null)
                 foreach (var p in players)
                     p.Dispose();
 
-
             readySave = false;
             readyLogs = false;
+            instance.StopAllCoroutines();
             instance.ClearGame();
             instance.StartCoroutine(Tools.WebRequest("https://lightningbot.tk/games/" + game,
                 instance.ParseGameSave));
@@ -174,7 +175,7 @@ namespace Script
 
         public static int GridToImage(float pos)
         {
-            return (int) (pos * Unit) - Trail.WIDTH / 2 - (int)(Unit / 2);
+            return (int) (pos * Unit) - Trail.WIDTH / 2 - (int) (Unit / 2);
         }
 
 
