@@ -70,7 +70,7 @@ namespace Script
         {
             Timeline.ResetTime();
             GameName.SetGameName(game);
-            HelpMessage.DeleteMessage();
+            StartMessage.DeleteMessage();
             if (players != null)
                 foreach (var p in players)
                     p.Dispose();
@@ -176,7 +176,7 @@ namespace Script
 
         public static int GridToImage(float pos)
         {
-            return (int) (pos * Unit) - Trail.WIDTH / 2 - (int) (Unit / 2);
+            return (int) (pos * Unit) - Trail.WIDTH / 2 + (int) (Unit / 2);
         }
 
 
@@ -193,7 +193,7 @@ namespace Script
 
         public static float GridToWorld(float pos)
         {
-            return ((pos / sizeMap - Unit / WIDTH / 2f) * scaleMap % scaleMap + scaleMap) % scaleMap;
+            return ((pos / sizeMap + Unit / WIDTH / 2f) * scaleMap % scaleMap + scaleMap) % scaleMap;
         }
     }
 }

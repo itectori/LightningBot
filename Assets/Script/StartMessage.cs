@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class HelpMessage : MonoBehaviour
+public class StartMessage : MonoBehaviour
 {
     private static TMPro.TextMeshProUGUI tm;
     
