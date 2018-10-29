@@ -35,8 +35,6 @@ namespace Script
         private const int WIDTH = 1024;
 
         [SerializeField] private Texture2D texture;
-        [SerializeField] private bool local;
-        [SerializeField] private string url;
         [SerializeField] private GameObject head;
 
         public static int TotalDuration;
@@ -59,11 +57,6 @@ namespace Script
             scaleMap = transform.localScale.x;
             GetComponent<Renderer>().material.mainTexture = texture;
             ClearGame();
-            if (local)
-            {
-                ParseGameSave(File.ReadAllText(url));
-                readyLogs = true;
-            }
         }
 
         public static void NewGame(string game)
