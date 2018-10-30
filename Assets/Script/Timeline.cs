@@ -17,6 +17,7 @@ namespace Script
         private float lastValue;
         private bool active = true;
         private bool changing = false;
+        private float multiplier = 1f;
 
         private static Timeline instance;
 
@@ -25,6 +26,7 @@ namespace Script
             instance = this;
             slider = GetComponent<Slider>();
             anim = GetComponent<Animation>();
+            slider.value = 1f;
         }
 
 
@@ -55,7 +57,7 @@ namespace Script
             if (lastValue != slider.value)
                 changing = true;
             if (!changing)
-                slider.value += Time.deltaTime / Math.Min(GameManager.TotalDuration / 7000f, 15f);
+                slider.value += multiplier * Time.deltaTime / Math.Min(GameManager.TotalDuration / 7000f, 15f);
             else if (Input.GetMouseButtonUp(0))
                 changing = false;
             foreach (var d in dependences)
@@ -63,6 +65,20 @@ namespace Script
             lastValue = slider.value;
         }
 
+        public void ClickPlus()
+        {
+            if (multiplier > 3)
+                return;
+            multiplier *= 2;
+        }
+
+        public void ClickMinus()
+        {
+            if (multiplier < 0.05f)
+                return;
+            multiplier /= 2;
+        }
+        
         public static void ResetTime()
         {
             instance.slider.interactable = true;
