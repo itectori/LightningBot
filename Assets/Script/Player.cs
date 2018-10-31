@@ -147,5 +147,16 @@ namespace Script
             if (head)
                 Object.Destroy(head.gameObject);
         }
+
+        public void EndInit()
+        {
+            for (var i = 1; i < trail.Count; i++)
+            {
+                if (trail[i] != null)
+                    continue;
+                trail[i - 1]?.SetLast();
+                return;
+            }
+        }
     }
 }

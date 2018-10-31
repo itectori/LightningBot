@@ -151,6 +151,11 @@ namespace Script
                 }
             }
 
+            foreach (var player in  players)
+            {
+                player.EndInit();
+            }
+            
             readySave = true;
         }
 
@@ -164,11 +169,7 @@ namespace Script
             }
 
             texture.Apply();
-            print(tmp);
-            tmp = 0;
         }
-
-        private static int tmp = 0;
 
         public static int GridToImage(float pos)
         {
@@ -176,14 +177,13 @@ namespace Script
         }
 
 
-        public static void DrawRec(int x, int y, int width, int height, Color color)
+        public static void DrawRec(int x, int y, int width, int height, Color drawColor)
         {
             for (var i = x; i <= x + width; i++)
             {
                 for (var j = y; j <= y + height; j++)
                 {
-                    instance.texture.SetPixel(i, j, color);
-                    tmp++;
+                    instance.texture.SetPixel(i, j, drawColor);
                 }
             }
         }

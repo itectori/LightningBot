@@ -12,6 +12,7 @@ namespace Script
         private readonly Direction dir;
         private readonly Color color;
         private int size;
+        private bool isLast = false;
 
         public const int WIDTH = 6;
 
@@ -53,7 +54,7 @@ namespace Script
             else
             {
                 var newLenght = (t - startF) / (endF - startF);
-                
+
                 if (newLenght > lastLenght)
                     DrawTrail(lastLenght, newLenght - lastLenght, color);
                 else
@@ -66,8 +67,15 @@ namespace Script
         {
             var sizePx = (int) (length * size * GameManager.Unit);
             var deltaPx = (int) (delta * size * GameManager.Unit + 1);
-            if (sizePx + deltaPx - 1 >= (int)(size * GameManager.Unit))
+            if (sizePx + deltaPx - 1 >= (int) (size * GameManager.Unit))
                 deltaPx--;
+            if (isLast && sizePx + deltaPx >= (int) (size * GameManager.Unit - WIDTH))
+            {
+                sizePx -= sizePx + deltaPx - (int) (size * GameManager.Unit - WIDTH) + 1;
+                if (sizePx < 0)
+                    return;
+            }
+
             switch (dir)
             {
                 case Direction.Right:
@@ -122,6 +130,11 @@ namespace Script
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public void SetLast()
+        {
+            isLast = true;
         }
     }
 }
