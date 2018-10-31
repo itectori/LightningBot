@@ -34,10 +34,6 @@ namespace Script
 
         private void Update()
         {
-            if (!GameManager.Ready)
-                return;
-            
-
             var pos = Input.mousePosition;
             if (pos != mousePos)
             {
@@ -52,6 +48,9 @@ namespace Script
                     Hide();
                 }
             }
+
+            if (!GameManager.Ready)
+                return;
 
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (lastValue != slider.value)
@@ -78,7 +77,7 @@ namespace Script
                 return;
             multiplier /= 2;
         }
-        
+
         public static void ResetTime()
         {
             instance.slider.interactable = true;

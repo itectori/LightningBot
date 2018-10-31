@@ -164,8 +164,11 @@ namespace Script
             }
 
             texture.Apply();
+            print(tmp);
+            tmp = 0;
         }
 
+        private static int tmp = 0;
 
         public static int GridToImage(float pos)
         {
@@ -175,11 +178,12 @@ namespace Script
 
         public static void DrawRec(int x, int y, int width, int height, Color color)
         {
-            for (var i = x; i < x + width; i++)
+            for (var i = x; i <= x + width; i++)
             {
-                for (var j = y; j < y + height; j++)
+                for (var j = y; j <= y + height; j++)
                 {
                     instance.texture.SetPixel(i, j, color);
+                    tmp++;
                 }
             }
         }
